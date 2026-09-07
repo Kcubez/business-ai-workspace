@@ -1,0 +1,237 @@
+import type { IndustryId } from '@/data/industries';
+
+export interface SectorPageCopy {
+  financeTitle: string;
+  salesTitle: string;
+  customerTitle: string;
+  customerSubtitle: string;
+  assetTitle: string;
+  assetSubtitle: string;
+  teamTitle: string;
+  teamSubtitle: string;
+  // Table Column Headers
+  clientColHeader: string;
+  companyColHeader: string;
+  serviceColHeader: string;
+  valueColHeader: string;
+  followUpTopicHeader: string;
+  assetNameHeader: string;
+  assetCategoryHeader: string;
+  assetOwnerHeader: string;
+  // Modal / Add Form Copy
+  addModalTitle: string;
+  addClientLabel: string;
+  addClientPlaceholder: string;
+  addCompanyLabel: string;
+  addCompanyPlaceholder: string;
+  addServiceLabel: string;
+  addServicePlaceholder: string;
+  addAmountLabel: string;
+  addAmountPlaceholder: string;
+}
+
+const copy: Record<IndustryId, SectorPageCopy> = {
+  clinic: {
+    financeTitle: 'Clinic Finance & Collections',
+    salesTitle: 'Appointments & Patient Demand',
+    customerTitle: 'Patients & Follow-up Desk',
+    customerSubtitle: 'Patient communications, appointment reminders, and care feedback tracking.',
+    assetTitle: 'Pharmacy & Equipment Register',
+    assetSubtitle: 'Medicine stock, medical equipment, licenses, and maintenance checkpoints.',
+    teamTitle: 'Doctors & Clinic Staff',
+    teamSubtitle: 'Clinical team directory, specialties, and shift coverage.',
+    clientColHeader: 'Patient Name',
+    companyColHeader: 'Affiliation / Insurance',
+    serviceColHeader: 'Consultation / Treatment',
+    valueColHeader: 'Treatment Fee (MMK)',
+    followUpTopicHeader: 'Care Checkpoint / Reminder',
+    assetNameHeader: 'Medicine / Equipment Name',
+    assetCategoryHeader: 'Category / Department',
+    assetOwnerHeader: 'Supervising Doctor / Pharmacist',
+    addModalTitle: 'Register New Patient Booking',
+    addClientLabel: 'Patient Full Name',
+    addClientPlaceholder: 'e.g. Daw Aye Aye Win',
+    addCompanyLabel: 'Corporate Insurer / Referral',
+    addCompanyPlaceholder: 'e.g. KBZ Life / Self-paying',
+    addServiceLabel: 'Treatment / Consultation Required',
+    addServicePlaceholder: 'e.g. Cardiology Consultation & ECG',
+    addAmountLabel: 'Estimated Fee (MMK)',
+    addAmountPlaceholder: '250000',
+  },
+  agency: {
+    financeTitle: 'Service Finance & Retainers',
+    salesTitle: 'Sales Pipeline & Proposals',
+    customerTitle: 'Client Success & Follow-ups',
+    customerSubtitle: 'Client communications, proposal follow-ups, and delivery feedback tracking.',
+    assetTitle: 'Projects & Infrastructure',
+    assetSubtitle: 'Project delivery, cloud services, licenses, domains, and maintenance checkpoints.',
+    teamTitle: 'Delivery Team & Capacity',
+    teamSubtitle: 'Team directory, delivery roles, and workload coverage.',
+    clientColHeader: 'Client / Contact',
+    companyColHeader: 'Client Company',
+    serviceColHeader: 'Deliverable / Scope',
+    valueColHeader: 'Contract Value (MMK)',
+    followUpTopicHeader: 'Milestone / Proposal Review',
+    assetNameHeader: 'Project / Cloud Asset',
+    assetCategoryHeader: 'Asset Type',
+    assetOwnerHeader: 'Technical Lead',
+    addModalTitle: 'Log New Client Proposal',
+    addClientLabel: 'Key Contact Name',
+    addClientPlaceholder: 'e.g. Ko Aung Myint',
+    addCompanyLabel: 'Client Organization',
+    addCompanyPlaceholder: 'e.g. Mandalay Retail Group',
+    addServiceLabel: 'Project Scope / Service Tier',
+    addServicePlaceholder: 'e.g. Custom ERP & Workflow AI',
+    addAmountLabel: 'Proposal Value (MMK)',
+    addAmountPlaceholder: '3500000',
+  },
+  retail: {
+    financeTitle: 'Retail Finance & Cash Flow',
+    salesTitle: 'Sales & POS Activity',
+    customerTitle: 'Customers & Service Desk',
+    customerSubtitle: 'Customer messages, delivery follow-ups, and after-sales support tracking.',
+    assetTitle: 'Inventory & Store Assets',
+    assetSubtitle: 'Stock, warehouse equipment, supplier assets, and replenishment checkpoints.',
+    teamTitle: 'Store Team & Shifts',
+    teamSubtitle: 'Store team directory, roles, and shift coverage.',
+    clientColHeader: 'Customer / Buyer',
+    companyColHeader: 'Branch / Channel',
+    serviceColHeader: 'Purchased Item / SKU',
+    valueColHeader: 'Order Amount (MMK)',
+    followUpTopicHeader: 'After-Sales & Warranty Inquiry',
+    assetNameHeader: 'Stock SKU / Store Asset',
+    assetCategoryHeader: 'Inventory Category',
+    assetOwnerHeader: 'Warehouse / Store Lead',
+    addModalTitle: 'Create Customer Sale Record',
+    addClientLabel: 'Customer Name',
+    addClientPlaceholder: 'e.g. Daw Nilar Oo',
+    addCompanyLabel: 'Channel / Store Outlet',
+    addCompanyPlaceholder: 'e.g. Online Store / Junction City POS',
+    addServiceLabel: 'Product Name / SKU Code',
+    addServicePlaceholder: 'e.g. Wireless Noise-Canceling Earbuds Pro',
+    addAmountLabel: 'Sale Amount (MMK)',
+    addAmountPlaceholder: '185000',
+  },
+  restaurant: {
+    financeTitle: 'Restaurant Finance & Food Cost',
+    salesTitle: 'Orders & Menu Performance',
+    customerTitle: 'Guests & Reservations Desk',
+    customerSubtitle: 'Guest communications, reservations, catering follow-ups, and feedback tracking.',
+    assetTitle: 'Kitchen & Stock Register',
+    assetSubtitle: 'Kitchen equipment, food stock, safety checks, and supplier checkpoints.',
+    teamTitle: 'Restaurant Team & Schedule',
+    teamSubtitle: 'Restaurant team directory, roles, and shift coverage.',
+    clientColHeader: 'Guest / Organizer',
+    companyColHeader: 'Table / Booking Type',
+    serviceColHeader: 'Ordered Menu / Catering Set',
+    valueColHeader: 'Bill Amount (MMK)',
+    followUpTopicHeader: 'Table Reservation & Feedback',
+    assetNameHeader: 'Kitchen Equipment / Stock Lot',
+    assetCategoryHeader: 'Station / Supplier',
+    assetOwnerHeader: 'Head Chef / Floor Manager',
+    addModalTitle: 'Log Guest Reservation & Order',
+    addClientLabel: 'Guest Contact Name',
+    addClientPlaceholder: 'e.g. U Zaw Min',
+    addCompanyLabel: 'Table / Event Type',
+    addCompanyPlaceholder: 'e.g. VIP Room 2 / Family Banquet',
+    addServiceLabel: 'Course Menu / Dining Set',
+    addServicePlaceholder: 'e.g. Chef Tasting Set (10 Pax)',
+    addAmountLabel: 'Estimated Bill (MMK)',
+    addAmountPlaceholder: '450000',
+  },
+  realestate: {
+    financeTitle: 'Property Finance & Commissions',
+    salesTitle: 'Buyer & Tenant Leads',
+    customerTitle: 'Viewings & Follow-up Desk',
+    customerSubtitle: 'Buyer communications, viewing reminders, and deal follow-up tracking.',
+    assetTitle: 'Properties & Listing Register',
+    assetSubtitle: 'Property listings, site assets, legal documents, and maintenance checkpoints.',
+    teamTitle: 'Sales Agents & Team',
+    teamSubtitle: 'Sales team directory, roles, and viewing coverage.',
+    clientColHeader: 'Prospect / Investor',
+    companyColHeader: 'Source / Agency Partner',
+    serviceColHeader: 'Target Property / Unit',
+    valueColHeader: 'Listing Value (MMK)',
+    followUpTopicHeader: 'Site Viewing & Inspection',
+    assetNameHeader: 'Property Listing / Title Asset',
+    assetCategoryHeader: 'Property Type',
+    assetOwnerHeader: 'Lead Listing Agent',
+    addModalTitle: 'Register Buyer / Property Inquiry',
+    addClientLabel: 'Buyer / Investor Name',
+    addClientPlaceholder: 'e.g. U Khin Maung Cho',
+    addCompanyLabel: 'Buyer Type / Organization',
+    addCompanyPlaceholder: 'e.g. Private Investor',
+    addServiceLabel: 'Property Listing Target',
+    addServicePlaceholder: 'e.g. Golden Valley Luxury Villa 4BR',
+    addAmountLabel: 'Budget / Offer (MMK)',
+    addAmountPlaceholder: '450000000',
+  },
+  education: {
+    financeTitle: 'Tuition Finance & Collections',
+    salesTitle: 'Admissions & Enrollment',
+    customerTitle: 'Students & Parent Follow-ups',
+    customerSubtitle: 'Student communications, enrollment reminders, and learning support tracking.',
+    assetTitle: 'Courses & Learning Assets',
+    assetSubtitle: 'Course delivery, learning systems, classrooms, and academic asset checkpoints.',
+    teamTitle: 'Teachers & Academy Staff',
+    teamSubtitle: 'Faculty directory, roles, and class schedule coverage.',
+    clientColHeader: 'Student / Applicant',
+    companyColHeader: 'School / Sponsor',
+    serviceColHeader: 'Course / Certification',
+    valueColHeader: 'Tuition Fee (MMK)',
+    followUpTopicHeader: 'Enrollment & Academic Check',
+    assetNameHeader: 'Course Platform / Campus Asset',
+    assetCategoryHeader: 'Academic Category',
+    assetOwnerHeader: 'Course Director / Coordinator',
+    addModalTitle: 'New Student Enrollment Inquiry',
+    addClientLabel: 'Student / Parent Name',
+    addClientPlaceholder: 'e.g. Ma Cherry Moe',
+    addCompanyLabel: 'Education Institution / Sponsor',
+    addCompanyPlaceholder: 'e.g. Yangon Tech University',
+    addServiceLabel: 'Enrolled Course / Batch',
+    addServicePlaceholder: 'e.g. Full-Stack Software Engineering (Batch 14)',
+    addAmountLabel: 'Course Tuition (MMK)',
+    addAmountPlaceholder: '950000',
+  },
+  logistics: {
+    financeTitle: 'Construction Finance & Receivables',
+    salesTitle: 'Projects & Contract Pipeline',
+    customerTitle: 'Client & Site Follow-ups',
+    customerSubtitle: 'Client communications, site-report follow-ups, and project feedback tracking.',
+    assetTitle: 'Projects, Materials & Equipment',
+    assetSubtitle: 'Sites, materials, equipment, supplier assets, and maintenance checkpoints.',
+    teamTitle: 'Site Team & Contractors',
+    teamSubtitle: 'Project team directory, site roles, and deployment coverage.',
+    clientColHeader: 'Developer / Client',
+    companyColHeader: 'Project Site / Location',
+    serviceColHeader: 'BOQ Package / Works Scope',
+    valueColHeader: 'Contract / Claim (MMK)',
+    followUpTopicHeader: 'Site Inspection / Submittal',
+    assetNameHeader: 'Project Site / Plant Equipment',
+    assetCategoryHeader: 'Trade / Package Type',
+    assetOwnerHeader: 'Project Director / QS Lead',
+    addModalTitle: 'Log Construction Works Claim / Scope',
+    addClientLabel: 'Developer / Client Representative',
+    addClientPlaceholder: 'e.g. U Myint Swe',
+    addCompanyLabel: 'Project Site / Development',
+    addCompanyPlaceholder: 'e.g. North Dagon Residence Development',
+    addServiceLabel: 'BOQ Scope / Structural Package',
+    addServicePlaceholder: 'e.g. Ready-Mix Concrete Pour Phase 3',
+    addAmountLabel: 'Claim Amount (MMK)',
+    addAmountPlaceholder: '48500000',
+  },
+};
+
+export function getSectorPageCopy(industryId: IndustryId) {
+  return copy[industryId];
+}
+
+export const demoSlugToIndustry: Record<string, IndustryId> = {
+  clinic: 'clinic',
+  it: 'agency',
+  retail: 'retail',
+  restaurant: 'restaurant',
+  construction: 'logistics',
+  'real-estate': 'realestate',
+  education: 'education',
+};
