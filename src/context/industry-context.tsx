@@ -34,6 +34,7 @@ interface IndustryContextType {
   dateRangeMultiplier: number;
   dateRangeLabel: string;
   addDemandRecord: (record: Omit<IndustryConfig['demandRecords'][0], 'id'>) => void;
+  updateDemandRecord: (id: string, record: Omit<IndustryConfig['demandRecords'][0], 'id'>) => void;
   deleteDemandRecord: (id: string) => void;
   addFinanceTransaction: (tx: Omit<IndustryConfig['financeTransactions'][0], 'id'>) => void;
   deleteFinanceTransaction: (id: string) => void;
@@ -186,6 +187,27 @@ export function IndustryProvider({ children }: { children: React.ReactNode }) {
     toast.success('Record removed');
   };
 
+  const updateDemandRecord = (id: string, record: Omit<IndustryConfig['demandRecords'][0], 'id'>) => {
+    if (!Number.isFinite(record.serviceAmount) || record.serviceAmount < 0 ||
+        !Number.isFinite(record.serviceQty) || record.serviceQty <= 0 ||
+        !record.createdDate || !validDate(record.createdDate)) {
+      toast.error('Enter a valid record date, amount and quantity.');
+      return;
+    }
+
+    const updated = {
+      ...industryState,
+      [currentIndustryId]: {
+        ...industryState[currentIndustryId],
+        demandRecords: industryState[currentIndustryId].demandRecords.map((existing) =>
+          existing.id === id ? { ...record, id } : existing
+        ),
+      },
+    };
+    saveCustomState(updated);
+    toast.success('Record updated successfully');
+  };
+
   const addFinanceTransaction = (tx: Omit<IndustryConfig['financeTransactions'][0], 'id'>) => {
     const newId = `tx-${Date.now()}`;
     if (!validDate(tx.date) || !Number.isFinite(tx.amount) || tx.amount <= 0) {
@@ -273,6 +295,7 @@ export function IndustryProvider({ children }: { children: React.ReactNode }) {
         dateRangeMultiplier: effectiveMultiplier,
         dateRangeLabel: periodLabel,
         addDemandRecord,
+        updateDemandRecord,
         deleteDemandRecord,
         addFinanceTransaction,
         deleteFinanceTransaction,

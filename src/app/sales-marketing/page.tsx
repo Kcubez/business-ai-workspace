@@ -9,6 +9,7 @@ import {
   Search,
   Plus,
   Trash2,
+  Pencil,
   X,
   PieChart,
 } from 'lucide-react';
@@ -21,6 +22,7 @@ export default function SalesMarketingPage() {
   const {
     currentIndustry,
     addDemandRecord,
+    updateDemandRecord,
     deleteDemandRecord,
     dateRangeLabel,
   } = useIndustry();
@@ -30,6 +32,7 @@ export default function SalesMarketingPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editingRecordId, setEditingRecordId] = useState<string | null>(null);
 
   const scaledLeads = metrics.leads;
   const scaledAppointments = metrics.qualified;
@@ -49,33 +52,82 @@ export default function SalesMarketingPage() {
   const [followUpDate, setFollowUpDate] = useState('2026-06-30');
   const [note, setNote] = useState('');
 
-  const handleCreate = (e: React.FormEvent) => {
+  const resetForm = () => {
+    setCreatedDate('');
+    setCustomerName('');
+    setPhone('');
+    setCompany('');
+    setServiceName('');
+    setServiceAmount('');
+    setSourceChannel('Facebook Ads');
+    setStatus('new');
+    setPriority('high');
+    setFollowUpDate('2026-06-30');
+    setNote('');
+  };
+
+  const closeRecordModal = () => {
+    setIsAddOpen(false);
+    setEditingRecordId(null);
+    resetForm();
+  };
+
+  const openNewRecord = () => {
+    resetForm();
+    setEditingRecordId(null);
+    setIsAddOpen(true);
+  };
+
+  const openEditRecord = (record: IndustryConfig['demandRecords'][number]) => {
+    setEditingRecordId(record.id);
+    setCreatedDate(demandDate(record));
+    setCustomerName(record.customerName);
+    setPhone(record.phone);
+    setCompany(record.company);
+    setServiceName(record.serviceName);
+    setServiceAmount(String(record.serviceAmount));
+    setSourceChannel(record.sourceChannel);
+    setStatus(record.status);
+    setPriority(record.priority);
+    setFollowUpDate(record.followUpDate);
+    setNote(record.note);
+    setIsAddOpen(true);
+  };
+
+  const handleSaveRecord = (e: React.FormEvent) => {
     e.preventDefault();
     if (!customerName || !serviceName || !recordDate || !Number.isFinite(Number(serviceAmount)) || Number(serviceAmount) < 0) return;
 
-    addDemandRecord({
+    const currentRecord = editingRecordId
+      ? demandRecords.find((record) => record.id === editingRecordId)
+      : undefined;
+    const recordData = {
       createdDate: recordDate,
       customerName,
       phone: phone || '09xxxxxxxx',
       company: company || 'Individual',
       serviceName,
       serviceAmount: Number(serviceAmount),
-      serviceQty: 1,
+      serviceQty: currentRecord?.serviceQty ?? 1,
       sourceChannel,
       status,
       priority,
       followUpDate,
       note: note || 'New inquiry logged via quick action.',
-    });
+    };
 
-    setIsAddOpen(false);
-    setCustomerName('');
-    setPhone('');
-    setCompany('');
-    setServiceName('');
-    setServiceAmount('');
-    setNote('');
+    if (editingRecordId) {
+      updateDemandRecord(editingRecordId, recordData);
+    } else {
+      addDemandRecord(recordData);
+    }
+    closeRecordModal();
   };
+
+  const sourceChannelOptions = Array.from(new Set([
+    ...demandRecords.map((record) => record.sourceChannel),
+    'Direct Contract', 'Facebook Ads', 'Telegram Inquiry', 'Viber VIP', 'Walk-in', 'Referral', 'Tender Submission',
+  ])).sort();
 
   const filteredRecords = demandRecords.filter((record) => {
     const matchesSearch =
@@ -144,7 +196,7 @@ export default function SalesMarketingPage() {
 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
-            onClick={() => setIsAddOpen(true)}
+            onClick={openNewRecord}
             className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white shadow-xs hover:opacity-90 cursor-pointer"
             style={{ backgroundColor: currentIndustry.color }}
           >
@@ -299,6 +351,16 @@ export default function SalesMarketingPage() {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
+            <colgroup>
+              <col className="w-36" />
+              <col />
+              <col />
+              <col className="w-36" />
+              <col className="w-24" />
+              <col className="w-28" />
+              <col className="w-32" />
+              <col className="w-16" />
+            </colgroup>
             <thead>
               <tr className="border-b border-slate-200 dark:border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
                 <th className="py-2.5 font-semibold">{pageCopy.clientColHeader}</th>
@@ -306,9 +368,9 @@ export default function SalesMarketingPage() {
                 <th className="py-2.5 font-semibold">{pageCopy.serviceColHeader}</th>
                 <th className="py-2.5 font-semibold">Channel</th>
                 <th className="py-2.5 font-semibold">Stage</th>
-                <th className="py-2.5 font-semibold">Follow-Up</th>
-                <th className="py-2.5 font-semibold">{pageCopy.valueColHeader}</th>
-                <th className="py-2.5 font-semibold text-right">Actions</th>
+                <th className="py-2.5 font-semibold whitespace-nowrap">Follow-Up</th>
+                <th className="py-2.5 pl-3 font-semibold text-left whitespace-nowrap">{pageCopy.valueColHeader}</th>
+                <th className="py-2.5 pl-2 font-semibold text-right whitespace-nowrap">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
@@ -328,7 +390,7 @@ export default function SalesMarketingPage() {
                         {item.customerName}
                       </div>
                       <div className="text-[10px] text-slate-400">{item.phone}</div>
-                      <div className="text-[10px] text-slate-400">Created: {demandDate(item)}</div>
+                      <div className="text-[10px] text-slate-400 whitespace-nowrap">Created: {demandDate(item)}</div>
                     </td>
                     <td className="py-3 text-slate-600 dark:text-slate-300 font-medium">
                       {item.company}
@@ -347,20 +409,30 @@ export default function SalesMarketingPage() {
                         {item.status}
                       </span>
                     </td>
-                    <td className="py-3 text-slate-500 font-mono text-[11px]">
+                    <td className="py-3 text-slate-500 font-mono text-[11px] whitespace-nowrap">
                       {item.followUpDate}
                     </td>
-                    <td className="py-3 font-bold font-mono text-slate-900 dark:text-white">
+                    <td className="py-3 pl-3 font-bold font-mono text-left text-slate-900 dark:text-white whitespace-nowrap">
                       {(item.serviceAmount * item.serviceQty).toLocaleString()}
                     </td>
-                    <td className="py-3 text-right">
+                    <td className="py-3 pl-2 text-right whitespace-nowrap">
+                      <div className="inline-flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => openEditRecord(item)}
+                          className="p-1 rounded-md text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/30 transition-colors cursor-pointer"
+                          title="Edit Record"
+                          aria-label={`Edit ${item.customerName}`}
+                        >
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
                       <button
                         onClick={() => deleteDemandRecord(item.id)}
                         className="p-1 rounded-md text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-colors cursor-pointer"
                         title="Delete Record"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -384,17 +456,17 @@ export default function SalesMarketingPage() {
           <div className="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full border border-slate-200 dark:border-slate-800 shadow-2xl p-6">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 mb-4">
               <h3 className="font-bold text-slate-900 dark:text-white text-base">
-                {pageCopy.addModalTitle}
+                {editingRecordId ? 'Edit Demand / Client Record' : pageCopy.addModalTitle}
               </h3>
               <button
-                onClick={() => setIsAddOpen(false)}
+                onClick={closeRecordModal}
                 className="text-slate-400 hover:text-slate-600 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="space-y-3 text-xs">
+            <form onSubmit={handleSaveRecord} className="space-y-3 text-xs">
               <label className="block text-slate-500">Record date<input aria-label="Record date" type="date" required value={recordDate} onChange={e => setCreatedDate(e.target.value)} min="2024-01-01" max="2026-09-07" className="mt-1 block w-full rounded-xl border p-2" /></label>
               <div>
                 <label className="block text-slate-500 mb-1 font-medium">{pageCopy.addClientLabel}</label>
@@ -460,13 +532,9 @@ export default function SalesMarketingPage() {
                     onChange={(e) => setSourceChannel(e.target.value)}
                     className="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 outline-none text-xs"
                   >
-                    <option value="Direct Contract">Direct Contract</option>
-                    <option value="Facebook Ads">Facebook Ads</option>
-                    <option value="Telegram Inquiry">Telegram Inquiry</option>
-                    <option value="Viber VIP">Viber VIP</option>
-                    <option value="Walk-in">Walk-in</option>
-                    <option value="Referral">Referral</option>
-                    <option value="Tender Submission">Tender Submission</option>
+                    {sourceChannelOptions.map((channel) => (
+                      <option key={channel} value={channel}>{channel}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -523,7 +591,7 @@ export default function SalesMarketingPage() {
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setIsAddOpen(false)}
+                  onClick={closeRecordModal}
                   className="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold cursor-pointer"
                 >
                   Cancel
@@ -532,7 +600,7 @@ export default function SalesMarketingPage() {
                   type="submit"
                   className="px-4 py-2 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-semibold cursor-pointer shadow-xs"
                 >
-                  Save Record
+                  {editingRecordId ? 'Save Changes' : 'Save Record'}
                 </button>
               </div>
             </form>
