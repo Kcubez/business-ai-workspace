@@ -15,11 +15,14 @@ export function MultiSeriesLineChart({
   revenueColor = '#0ea5e9',
   expenseColor = '#64748b',
   height = 240,
+  labelScale = 1,
 }: {
   data: ChartPoint[];
   revenueColor?: string;
   expenseColor?: string;
   height?: number;
+  /** Keeps SVG axis labels visually balanced when the chart spans a wider card. */
+  labelScale?: number;
 }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -42,6 +45,7 @@ export function MultiSeriesLineChart({
     1
   );
   const chartMax = Math.ceil(maxVal * 1.15);
+  const axisLabelSize = 10 * labelScale;
 
   const plotWidth = width - paddingLeft - paddingRight;
   const plotHeight = height - paddingTop - paddingBottom;
@@ -98,10 +102,10 @@ export function MultiSeriesLineChart({
               />
               <text
                 x={paddingLeft - 10}
-                y={y + 3.5}
-                fontSize="10"
+                y={y + 3.5 * labelScale}
+                fontSize={axisLabelSize}
                 textAnchor="end"
-                className="fill-slate-400 font-mono text-[10px]"
+                className="fill-slate-400 font-mono"
               >
                 {formatShort(val)}
               </text>
@@ -144,9 +148,9 @@ export function MultiSeriesLineChart({
               <text
                 x={x}
                 y={height - 8}
-                fontSize="10"
+                fontSize={axisLabelSize}
                 textAnchor="middle"
-                className="fill-slate-500 font-medium text-[10px]"
+                className="fill-slate-500 font-medium"
               >
                 {d.label}
               </text>

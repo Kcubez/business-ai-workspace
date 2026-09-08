@@ -38,6 +38,7 @@ export default function DashboardOverviewPage() {
     shareText: formatPercent(shares[index]),
     amountText: item.value.toLocaleString() + ' MMK',
   }));
+  const primaryRevenueSource = revenueSources[0];
   const stats = {
     revenueTodaySub: 'Income transactions in selected period',
     primaryMetricTitle: 'Demand Records', primaryMetricSub: 'Created in selected period',
@@ -265,9 +266,9 @@ export default function DashboardOverviewPage() {
         </div>
       </div>
 
-      {/* Analytics Row: Revenue Line Chart + Revenue Sources */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Financial Trend Chart (2 columns) */}
+      {/* Financial overview: trend, sources and AI actions, then the operational queue */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Full-width financial trend */}
         <div className="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
           <div className="flex items-center justify-between mb-4">
             <div>
@@ -297,11 +298,12 @@ export default function DashboardOverviewPage() {
             data={scaledTrend}
             revenueColor={currentIndustry.color}
             expenseColor="#94a3b8"
+            labelScale={0.62}
           />
         </div>
 
-        {/* Right: Revenue Sources Ranking & Donut Pie Chart (1 column) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
+        {/* Revenue Sources */}
+        <div className="self-start p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
           <div>
             <div className="flex items-center justify-between mb-3">
               <div>
@@ -401,6 +403,27 @@ export default function DashboardOverviewPage() {
                 ))}
               </div>
             )}
+
+            {primaryRevenueSource && (
+              <div className="mt-5 grid grid-cols-2 gap-3 border-t border-slate-100 dark:border-slate-800 pt-4">
+                <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 px-3 py-2.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                    Top source
+                  </p>
+                  <p className="mt-1 truncate text-xs font-bold text-slate-800 dark:text-slate-100">
+                    {primaryRevenueSource.name}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 px-3 py-2.5">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                    Revenue share
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-slate-800 dark:text-slate-100">
+                    {primaryRevenueSource.shareText}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           <Link
@@ -411,12 +434,9 @@ export default function DashboardOverviewPage() {
             <ChevronRight className="w-4 h-4" />
           </Link>
         </div>
-      </div>
 
-      {/* Bottom Grid: Live Operations Queue + AI Action Briefs */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left: Live Operational Activity Table (2 cols) */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+        {/* Full-width operational queue, placed below the supporting insights */}
+        <div className="lg:col-span-2 lg:order-3 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -488,8 +508,8 @@ export default function DashboardOverviewPage() {
           />
         </div>
 
-        {/* Right: AI Action Briefs (1 col) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs self-start">
+        {/* AI Action Briefs */}
+        <div className="lg:order-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs self-start">
           <div className="flex items-center gap-2 mb-1 text-purple-600 dark:text-purple-400">
             <Bot className="w-5 h-5" />
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
