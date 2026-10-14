@@ -2,7 +2,7 @@
 
 ## Product
 
-Business AI Workspace is a sector-aware business dashboard used to demonstrate a future business intelligence product to prospective clients. It makes a shared platform feel tailored to a clinic, retailer, restaurant, construction company, property business, academy, or IT service provider.
+Business AI Workspace is a sector-aware business dashboard used to demonstrate a future business intelligence product to prospective clients. It makes a shared platform feel tailored to a clinic, retailer, restaurant, construction company, property business, academy, factory, or IT service provider.
 
 ## Target users
 
@@ -27,7 +27,7 @@ Business AI Workspace is a sector-aware business dashboard used to demonstrate a
 
 ## Supported sector demos
 
-Clinic, IT Services, Retail, Restaurant & Cafe, Construction, Real Estate, and Education & Training.
+Clinic, IT Services, Retail, Restaurant & Cafe, Construction, Real Estate, Education & Training, and Factory.
 
 ## Non-goals for this phase
 

@@ -1,4 +1,4 @@
-export type IndustryId = 'clinic' | 'agency' | 'retail' | 'restaurant' | 'realestate' | 'education' | 'logistics';
+export type IndustryId = 'clinic' | 'agency' | 'retail' | 'restaurant' | 'realestate' | 'education' | 'logistics' | 'factory';
 
 export type SidebarIcon =
   | 'LayoutDashboard'
@@ -16,7 +16,8 @@ export type SidebarIcon =
   | 'GraduationCap'
   | 'Truck'
   | 'BriefcaseBusiness'
-  | 'HeartPulse';
+  | 'HeartPulse'
+  | 'Factory';
 
 export interface SidebarGroup {
   label: string;
@@ -31,6 +32,13 @@ export interface IndustryConfig {
   icon: string;
   color: string;
   sidebarGroups: SidebarGroup[];
+  teamMembers?: {
+    name: string;
+    role: string;
+    department: string;
+    status: string;
+    shifts: string;
+  }[];
   stats: {
     revenueToday: string;
     revenueTodaySub: string;
@@ -139,6 +147,112 @@ export interface IndustryConfig {
 }
 
 export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
+  factory: {
+    id: 'factory',
+    name: 'Factory',
+    tagline: 'Production orders, factory costs, materials, and equipment performance.',
+    badge: 'Manufacturing Enterprise',
+    icon: 'Factory',
+    color: '#d97706',
+    sidebarGroups: [
+      { label: 'Factory Operations', items: [
+        { title: 'Overview', href: '/', icon: 'LayoutDashboard' },
+        { title: 'Production Orders', href: '/sales-marketing', icon: 'ShoppingCart' },
+        { title: 'Buyers & Follow-ups', href: '/customer-service', icon: 'Users' },
+        { title: 'Factory Team & Shifts', href: '/hr', icon: 'Factory' },
+        { title: 'Materials & Equipment', href: '/projects-infra', icon: 'Package' },
+      ] },
+      { label: 'Intelligence', items: [
+        { title: 'Factory Finance', href: '/finance', icon: 'Wallet' },
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
+      ] },
+      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+    ],
+    teamMembers: [
+      { name: 'U Aung Min', role: 'Factory Manager', department: 'Operations', status: 'Active', shifts: 'Full Day' },
+      { name: 'Daw Thiri Win', role: 'Production Planner', department: 'Production', status: 'Active', shifts: 'Morning Shift' },
+      { name: 'Ko Htet Naing', role: 'Line Supervisor', department: 'Production', status: 'Active', shifts: 'Evening Shift' },
+      { name: 'Ma May Zin', role: 'Quality Inspector', department: 'Quality Control', status: 'Active', shifts: 'Day Shift' },
+      { name: 'Ko Wai Yan', role: 'Maintenance Technician', department: 'Maintenance', status: 'Active', shifts: 'Morning Shift' },
+      { name: 'Daw Khin Aye', role: 'Materials Coordinator', department: 'Warehouse', status: 'On Leave', shifts: 'Covered' },
+    ],
+    stats: {
+      revenueToday: '8,400,000 MMK', revenueTodaySub: 'Finished goods shipments',
+      primaryMetricTitle: 'Units Produced', primaryMetricValue: '2,400', primaryMetricSub: 'Across 3 production lines',
+      secondaryMetricTitle: 'Production Orders', secondaryMetricValue: '16', secondaryMetricSub: '6 ready for dispatch',
+      efficiencyMetricTitle: 'Line Utilization', efficiencyMetricValue: '86%', efficiencyMetricSub: 'Demo production snapshot',
+    },
+    targets: {
+      salesTarget: 180000000, actualRevenue: 152000000, expectedRevenue: 145000000,
+      volumeTarget: 80, actualVolume: 68, expectedVolume: 64,
+      expenseBudget: 120000000, actualExpense: 98000000, expectedExpense: 95000000,
+    },
+    revenueSources: [
+      { rank: 1, name: 'Wholesale Packaging', shareText: '45% of revenue', percent: 90, amountText: '3,780,000 MMK' },
+      { rank: 2, name: 'Contract Manufacturing', shareText: '30% of revenue', percent: 70, amountText: '2,520,000 MMK' },
+      { rank: 3, name: 'Finished Goods Supply', shareText: '25% of revenue', percent: 55, amountText: '2,100,000 MMK' },
+    ],
+    queueTitle: 'Production & Dispatch Queue',
+    queueSubtitle: 'Demo snapshot of factory batches and dispatch readiness',
+    queueColumns: ['Batch / Order', 'Production Line', 'Status', 'Dispatch Time'],
+    queueItems: Array.from({ length: 16 }, (_, index) => ({
+      col1: `BATCH-${1001 + index} • ${['Carton Boxes', 'Food Containers', 'Printed Packaging', 'Storage Crates'][index % 4]}`,
+      col2: `Line ${(index % 3) + 1}`,
+      status: ['In Production', 'Quality Check', 'Ready for Dispatch', 'Material Hold'][index % 4],
+      statusType: (['info', 'warning', 'success', 'danger'] as const)[index % 4],
+      col4: `${9 + Math.floor(index / 4)}:${index % 2 === 0 ? '00' : '30'}`,
+    })),
+    aiBriefs: [
+      { title: 'Replenish Packaging Materials', description: 'Kraft paper stock covers only two more production shifts. Confirm the next supplier delivery.', actionText: 'Review Materials', actionLink: '/projects-infra', severity: 'urgent' },
+      { title: 'Schedule Line 2 Maintenance', description: 'The carton cutting machine is approaching its planned service checkpoint. Coordinate downtime with the production planner.', actionText: 'Review Equipment', actionLink: '/projects-infra', severity: 'warning' },
+      { title: 'Confirm Wholesale Dispatches', description: 'Six production batches are ready for buyer confirmation before dispatch.', actionText: 'Open Buyer Follow-ups', actionLink: '/customer-service', severity: 'info' },
+    ],
+    financialTrend: [
+      { label: 'Jan', revenue: 125000000, expense: 82000000, profit: 43000000 },
+      { label: 'Feb', revenue: 132000000, expense: 87000000, profit: 45000000 },
+      { label: 'Mar', revenue: 140000000, expense: 91000000, profit: 49000000 },
+      { label: 'Apr', revenue: 138000000, expense: 90000000, profit: 48000000 },
+      { label: 'May', revenue: 148000000, expense: 96000000, profit: 52000000 },
+      { label: 'Jun', revenue: 152000000, expense: 98000000, profit: 54000000 },
+    ],
+    salesFunnel: { leads: 80, appointments: 64, closedDeals: 48, leadToAppointmentRate: 80, appointmentToCloseRate: 75 },
+    demandRecords: Array.from({ length: 16 }, (_, index) => ({
+      id: `factory-order-${index + 1}`, createdDate: `2026-06-${String(5 + index).padStart(2, '0')}`,
+      customerName: ['U Min Thu', 'Daw Hnin Wai', 'Ko Aung Ko', 'Ma Su Mon'][index % 4],
+      phone: `094500${1200 + index}`, company: ['Yangon Wholesale Group', 'Mandalay Food Supply', 'Delta Packaging Co.', 'Bago Distribution'][index % 4],
+      serviceName: ['Carton Boxes (500-unit batch)', 'Food Containers (1,000-unit batch)', 'Printed Packaging (500-unit batch)', 'Storage Crates (100-unit batch)'][index % 4],
+      serviceAmount: [2500000, 1800000, 3200000, 4500000][index % 4], serviceQty: 1 + index % 3,
+      sourceChannel: ['Distributor Referral', 'Sales Visit', 'Buyer Email', 'Trade Fair'][index % 4],
+      status: (['closed', 'quoted', 'pending', 'new', 'contacted'] as const)[index % 5],
+      priority: (['high', 'medium', 'low'] as const)[index % 3], followUpDate: `2026-06-${String(21 + index % 8).padStart(2, '0')}`,
+      note: 'Confirm batch specification, quality sample approval, and dispatch schedule. Quantity is measured in production batches.',
+    })),
+    financeTransactions: Array.from({ length: 16 }, (_, index) => ({
+      id: `factory-tx-${index + 1}`, date: `2026-06-${String(5 + index).padStart(2, '0')}`,
+      title: ['Wholesale Carton Shipment', 'Kraft Paper Purchase', 'Contract Packaging Payment', 'Factory Shift Wages', 'Finished Goods Shipment', 'Machine Maintenance', 'Distributor Settlement', 'Factory Electricity'][index % 8],
+      category: ['Finished Goods Sales', 'Raw Materials', 'Contract Manufacturing', 'Labour', 'Finished Goods Sales', 'Maintenance', 'Finished Goods Sales', 'Utilities'][index % 8],
+      type: index % 2 === 0 ? 'income' : 'expense',
+      amount: [8400000, 4200000, 6200000, 2800000, 7500000, 1500000, 9800000, 2100000][index % 8],
+      paymentMethod: 'Bank Transfer', reference: `FAC-202606-${String(index + 1).padStart(3, '0')}`,
+    })),
+    customerFollowUps: Array.from({ length: 16 }, (_, index) => ({
+      id: `factory-follow-up-${index + 1}`, name: ['U Min Thu', 'Daw Hnin Wai', 'Ko Aung Ko', 'Ma Su Mon'][index % 4],
+      phone: `094500${1200 + index}`,
+      topic: ['Approve Packaging Sample', 'Confirm Dispatch Schedule', 'Review Batch Quality Feedback', 'Confirm Repeat Production Order'][index % 4],
+      channel: ['Phone Call', 'Buyer Email', 'Viber', 'Factory Visit'][index % 4],
+      dueStatus: (['due_today', 'overdue', 'upcoming'] as const)[index % 3],
+      dueDate: ['2026-06-25', '2026-06-23', '2026-06-28'][index % 3],
+      notes: `Follow up on production order factory-order-${index + 1} with the buyer.`,
+    })),
+    projectItems: [
+      { id: 'factory-asset-1', name: 'Carton Cutting Machine — Line 2', category: 'Production Equipment', status: 'Expiring Soon', expiryDate: '2026-07-05', owner: 'Ko Wai Yan', value: '48,000,000 MMK' },
+      { id: 'factory-asset-2', name: 'Kraft Paper — Batch KP-26', category: 'Raw Materials', status: 'Active', expiryDate: '2026-08-30', owner: 'Daw Khin Aye', value: '12,500,000 MMK' },
+      { id: 'factory-asset-3', name: 'Food Container Mould — Line 1', category: 'Production Tooling', status: 'Active', expiryDate: '2026-12-15', owner: 'Ko Htet Naing', value: '18,000,000 MMK' },
+      { id: 'factory-asset-4', name: 'Finished Goods Warehouse', category: 'Storage & Dispatch', status: 'Active', expiryDate: '2026-11-30', owner: 'U Aung Min', value: '35,000,000 MMK' },
+      { id: 'factory-asset-5', name: 'Line 3 Preventive Maintenance', category: 'Maintenance', status: 'In Progress', expiryDate: '2026-07-10', owner: 'Ko Wai Yan', value: '2,400,000 MMK' },
+    ],
+  },
   clinic: {
     id: 'clinic',
     name: 'Clinic & Healthcare',

@@ -35,6 +35,7 @@ Shared dashboard and workspace pages
 - navigation: `sidebarGroups`
 - dashboard: KPI cards, targets, revenue sources, trends, queue, AI briefs
 - shared records: demand/pipeline, finance transactions, follow-ups, assets/projects
+- optional `teamMembers`: sector-owned staff roster, currently supplied by Factory
 
 When adding a sector, add a complete config object, page copy in `sector-page-copy.ts`, an icon mapping if needed, and a demo slug.
 
@@ -49,7 +50,7 @@ When adding a sector, add a complete config object, page copy in `sector-page-co
 - `mot_selected_industry`
 - `mot_custom_industry_data_v4`
 
-Record actions update in-memory state and write it back to localStorage. Cache restoration merges valid saved record collections into current source configuration, preserving empty arrays and intentional deletions. Invalid collections fall back independently to enriched seed data. Cached targets/navigation never override source configuration. Legacy actual KPI and trend fixtures are retained in the data schema but are no longer used as calculated reporting actuals.
+Record actions update in-memory state and write it back to localStorage. Cache restoration merges valid saved record collections into current source configuration, preserving empty arrays and intentional deletions. Invalid collections fall back independently to enriched seed data. Cached targets/navigation never override source configuration. Newly added sectors and optional configuration fields (such as Factory’s team roster) come from fresh source defaults even when older cached payloads omit them. Legacy actual KPI and trend fixtures are retained in the data schema but are no longer used as calculated reporting actuals.
 
 ## Top Header Bar & Shell Polish
 
@@ -63,7 +64,7 @@ The workspace shell features a unified sticky `TopHeaderBar` providing:
 
 `/demo/[sector]` uses `generateStaticParams` to publish a fixed set of sector pages. The route translates its slug with `demoSlugToIndustry`, then the client demo wrapper selects that industry before rendering the shared dashboard.
 
-Current slugs: `clinic`, `it`, `retail`, `restaurant`, `construction`, `real-estate`, and `education`.
+Current slugs: `clinic`, `it`, `retail`, `restaurant`, `construction`, `real-estate`, `education`, and `factory`.
 
 ## Shared-page strategy
 

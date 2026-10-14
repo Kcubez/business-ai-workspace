@@ -31,6 +31,33 @@ export interface SectorPageCopy {
 }
 
 const copy: Record<IndustryId, SectorPageCopy> = {
+  factory: {
+    financeTitle: 'Factory Finance & Production Costs',
+    salesTitle: 'Production Orders & Buyer Pipeline',
+    customerTitle: 'Buyers & Dispatch Follow-ups',
+    customerSubtitle: 'Buyer communications, sample approvals, dispatch schedules, and quality feedback.',
+    assetTitle: 'Materials & Factory Equipment',
+    assetSubtitle: 'Raw materials, production machinery, tooling, and maintenance checkpoints.',
+    teamTitle: 'Factory Team & Shifts',
+    teamSubtitle: 'Production, quality control, maintenance, and warehouse shift coverage.',
+    clientColHeader: 'Buyer / Contact',
+    companyColHeader: 'Buyer Company',
+    serviceColHeader: 'Product / Production Batch',
+    valueColHeader: 'Batch Price (MMK)',
+    followUpTopicHeader: 'Sample Approval / Dispatch Checkpoint',
+    assetNameHeader: 'Material / Machine Name',
+    assetCategoryHeader: 'Material / Equipment Category',
+    assetOwnerHeader: 'Production / Maintenance Lead',
+    addModalTitle: 'Log New Production Order Inquiry',
+    addClientLabel: 'Buyer Contact Name',
+    addClientPlaceholder: 'e.g. U Min Thu',
+    addCompanyLabel: 'Buyer Organization',
+    addCompanyPlaceholder: 'e.g. Yangon Wholesale Group',
+    addServiceLabel: 'Product / Batch Specification',
+    addServicePlaceholder: 'e.g. Carton Boxes (500-unit batch)',
+    addAmountLabel: 'Price per Batch (MMK)',
+    addAmountPlaceholder: '2500000',
+  },
   clinic: {
     financeTitle: 'Clinic Finance & Collections',
     salesTitle: 'Appointments & Patient Demand',
@@ -234,4 +261,5 @@ export const demoSlugToIndustry: Record<string, IndustryId> = {
   construction: 'logistics',
   'real-estate': 'realestate',
   education: 'education',
+  factory: 'factory',
 };

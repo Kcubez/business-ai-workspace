@@ -29,6 +29,7 @@ import {
   Building,
   GraduationCap,
   Truck,
+  Factory,
   LogOut,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -59,6 +60,7 @@ const industryIcons: Record<string, IconComponent> = {
   Building,
   GraduationCap,
   Truck,
+  Factory,
 };
 
 const sidebarIcons: Record<SidebarIcon, IconComponent> = {
@@ -76,6 +78,7 @@ const sidebarIcons: Record<SidebarIcon, IconComponent> = {
   Building2,
   GraduationCap,
   Truck,
+  Factory,
   BriefcaseBusiness,
   HeartPulse,
 };

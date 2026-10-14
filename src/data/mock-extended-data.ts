@@ -2,6 +2,7 @@ import { IndustryConfig, IndustryId } from './industries';
 
 // 15+ comprehensive rows for each table to demonstrate smooth pagination (10 rows/page)
 export const EXTENDED_DEMAND_RECORDS: Record<IndustryId, IndustryConfig['demandRecords']> = {
+  factory: [],
   clinic: [
     {
       id: 'cl-1',
@@ -463,6 +464,7 @@ export const EXTENDED_DEMAND_RECORDS: Record<IndustryId, IndustryConfig['demandR
 };
 
 export const EXTENDED_FINANCE_TRANSACTIONS: Record<IndustryId, IndustryConfig['financeTransactions']> = {
+  factory: [],
   clinic: [
     { id: 'tx-c1', date: '2026-06-25', title: 'Consultations & Procedures (Day Total)', category: 'Medical Revenue', type: 'income', amount: 3840000, paymentMethod: 'KBZPay / Cash', reference: 'REC-2026-0625' },
     { id: 'tx-c2', date: '2026-06-25', title: 'Pharmaceutical Supplies Restock', category: 'Medical Supplies', type: 'expense', amount: 1250000, paymentMethod: 'Bank Transfer', reference: 'INV-MED-881' },
@@ -507,6 +509,7 @@ export const EXTENDED_FINANCE_TRANSACTIONS: Record<IndustryId, IndustryConfig['f
 };
 
 export const EXTENDED_CUSTOMER_FOLLOWUPS: Record<IndustryId, IndustryConfig['customerFollowUps']> = {
+  factory: [],
   clinic: [
     { id: 'cf-1', name: 'Daw Khin Aye', phone: '095123456', topic: 'Review Lab Blood Test Result', channel: 'Phone Call', dueStatus: 'due_today', dueDate: '2026-06-25', notes: 'Fast blood sugar results arrived from lab.' },
     { id: 'cf-2', name: 'U Thein Zaw', phone: '097891234', topic: 'Dental Crown Fitting Reminder', channel: 'Telegram / SMS', dueStatus: 'due_today', dueDate: '2026-06-25', notes: 'Appointment set for 2:00 PM.' },
@@ -551,6 +554,7 @@ export const EXTENDED_CUSTOMER_FOLLOWUPS: Record<IndustryId, IndustryConfig['cus
 };
 
 export const EXTENDED_QUEUE_ITEMS: Record<IndustryId, IndustryConfig['queueItems']> = {
+  factory: [],
   clinic: [
     { col1: 'PT-1048 • Daw Khin Aye', col2: 'Dr. Aye Myat (General)', status: 'In Consultation', statusType: 'success', col4: '10:30 AM' },
     { col1: 'PT-1051 • U Thein Zaw', col2: 'Dr. Nandar (Dental)', status: 'Waiting Room', statusType: 'warning', col4: '10:45 AM' },

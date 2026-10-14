@@ -75,6 +75,7 @@ export function IndustryProvider({ children }: { children: React.ReactNode }) {
     if (routeIndustry) setCurrentIndustryId(routeIndustry);
 
     try {
+      if (routeIndustry) localStorage.setItem('mot_selected_industry', routeIndustry);
       const saved = localStorage.getItem('mot_selected_industry') as IndustryId;
       if (!routeIndustry && saved && Object.hasOwn(INDUSTRIES, saved)) {
         setCurrentIndustryId(saved);

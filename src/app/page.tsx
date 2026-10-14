@@ -298,7 +298,6 @@ export default function DashboardOverviewPage() {
             data={scaledTrend}
             revenueColor={currentIndustry.color}
             expenseColor="#94a3b8"
-            labelScale={0.62}
           />
         </div>
 

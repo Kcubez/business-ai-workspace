@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useId, useRef, useState, type PointerEvent } from 'react';
 import { categoryShares } from '@/lib/metrics';
 
 interface ChartPoint {
@@ -10,233 +10,144 @@ interface ChartPoint {
   profit: number;
 }
 
+const compactAmount = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
+
+function formatAxisDate(label: string) {
+  if (!/^\d{4}-\d{2}(-\d{2})?$/.test(label)) return label;
+  const date = new Date(`${label.length === 7 ? `${label}-01` : label}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return label;
+  return date.toLocaleDateString('en-GB', label.length === 7
+    ? { month: 'short', year: '2-digit', timeZone: 'UTC' }
+    : { day: 'numeric', month: 'short', timeZone: 'UTC' });
+}
+
 export function MultiSeriesLineChart({
   data,
   revenueColor = '#0ea5e9',
   expenseColor = '#64748b',
   height = 240,
-  labelScale = 1,
 }: {
   data: ChartPoint[];
   revenueColor?: string;
   expenseColor?: string;
   height?: number;
-  /** Keeps SVG axis labels visually balanced when the chart spans a wider card. */
-  labelScale?: number;
 }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const gradientId = useId();
+  const [width, setWidth] = useState(680);
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-48 text-sm text-slate-400">
-        No chart data available
-      </div>
-    );
-  }
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const observer = new ResizeObserver(([entry]) => {
+      setWidth(Math.max(1, entry.contentRect.width));
+    });
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
 
-  const paddingLeft = 82;
-  const paddingRight = 32;
-  const paddingTop = 32;
-  const paddingBottom = 35;
-  const width = 680;
-
-  const maxVal = Math.max(
-    ...data.flatMap((d) => [d.revenue, d.expense]),
-    1
-  );
-  const chartMax = Math.ceil(maxVal * 1.15);
-  const axisLabelSize = 10 * labelScale;
-
-  const plotWidth = width - paddingLeft - paddingRight;
+  const paddingLeft = 54;
+  const paddingRight = 24;
+  const paddingTop = 24;
+  const paddingBottom = 36;
+  const plotWidth = Math.max(1, width - paddingLeft - paddingRight);
   const plotHeight = height - paddingTop - paddingBottom;
-
-  const getX = (index: number) => {
-    return paddingLeft + (data.length === 1 ? 0.5 : index / (data.length - 1)) * plotWidth;
-  };
-
-  const getY = (val: number) => {
-    return paddingTop + plotHeight - (val / chartMax) * plotHeight;
-  };
-
-  const revenuePath = data
-    .map((d, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(d.revenue)}`)
-    .join(' ');
-
-  const expensePath = data
-    .map((d, i) => `${i === 0 ? 'M' : 'L'} ${getX(i)} ${getY(d.expense)}`)
-    .join(' ');
-
+  const maxVal = data.reduce((max, point) => Math.max(max, point.revenue, point.expense), 1);
+  const magnitude = 10 ** Math.floor(Math.log10(maxVal));
+  const chartMax = Math.ceil(maxVal * 1.1 / magnitude) * magnitude;
+  const getX = (index: number) => paddingLeft + (data.length === 1 ? 0.5 : index / (data.length - 1)) * plotWidth;
+  const getY = (value: number) => paddingTop + plotHeight - value / chartMax * plotHeight;
+  const tickCount = Math.min(data.length, Math.max(2, Math.floor(plotWidth / 85) + 1));
+  const tickIndices = new Set(Array.from({ length: tickCount }, (_, index) =>
+    tickCount === 1 ? 0 : Math.round(index * (data.length - 1) / (tickCount - 1))));
+  const activeIndex = hoveredIdx === null || !data.length ? null : Math.min(hoveredIdx, data.length - 1);
+  const activePoint = activeIndex === null ? undefined : data[activeIndex];
+  const showDots = data.length <= Math.min(18, Math.floor(plotWidth / 24));
+  const revenuePath = data.map((point, index) => `${index === 0 ? 'M' : 'L'} ${getX(index)} ${getY(point.revenue)}`).join(' ');
+  const expensePath = data.map((point, index) => `${index === 0 ? 'M' : 'L'} ${getX(index)} ${getY(point.expense)}`).join(' ');
   const revenueArea = `${revenuePath} L ${getX(data.length - 1)} ${paddingTop + plotHeight} L ${getX(0)} ${paddingTop + plotHeight} Z`;
-
-  const formatShort = (num: number) => {
-    return Math.round(num).toLocaleString();
+  const tooltipWidth = Math.min(260, width);
+  const inspectPointer = (event: PointerEvent<SVGRectElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const position = (event.clientX - bounds.left) / bounds.width;
+    setHoveredIdx(Math.max(0, Math.min(data.length - 1, Math.round(position * (data.length - 1)))));
   };
 
   return (
-    <div className="relative w-full overflow-visible">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        className="w-full h-auto overflow-visible select-none"
-      >
-        <defs>
-          <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={revenueColor} stopOpacity="0.25" />
-            <stop offset="100%" stopColor={revenueColor} stopOpacity="0.0" />
-          </linearGradient>
-        </defs>
-
-        {/* Grid lines */}
-        {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
-          const y = paddingTop + plotHeight * (1 - ratio);
-          const val = chartMax * ratio;
-          return (
-            <g key={i}>
-              <line
-                x1={paddingLeft}
-                y1={y}
-                x2={width - paddingRight}
-                y2={y}
-                stroke="#e2e8f0"
-                strokeDasharray="3 3"
-                className="dark:stroke-slate-800"
-              />
-              <text
-                x={paddingLeft - 10}
-                y={y + 3.5 * labelScale}
-                fontSize={axisLabelSize}
-                textAnchor="end"
-                className="fill-slate-400 font-mono"
-              >
-                {formatShort(val)}
-              </text>
-            </g>
-          );
-        })}
-
-        {/* Area */}
-        <path d={revenueArea} fill="url(#revenueGrad)" />
-
-        {/* Expense Line */}
-        <path
-          d={expensePath}
-          fill="none"
-          stroke={expenseColor}
-          strokeWidth="2"
-          strokeDasharray="4 4"
-        />
-
-        {/* Revenue Line */}
-        <path
-          d={revenuePath}
-          fill="none"
-          stroke={revenueColor}
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-
-        {/* Points & Labels */}
-        {data.map((d, i) => {
-          const x = getX(i);
-          const yRev = getY(d.revenue);
-          const yExp = getY(d.expense);
-          const isHovered = hoveredIdx === i;
-
-          return (
-            <g key={i}>
-              {/* X Axis Label */}
-              <text
-                x={x}
-                y={height - 8}
-                fontSize={axisLabelSize}
-                textAnchor="middle"
-                className="fill-slate-500 font-medium"
-              >
-                {d.label}
-              </text>
-
-              {/* Expense dot */}
-              <circle
-                cx={x}
-                cy={yExp}
-                r={isHovered ? 4 : 2.5}
-                fill={expenseColor}
-                className="transition-all duration-150"
-              />
-
-              {/* Revenue dot */}
-              <circle
-                cx={x}
-                cy={yRev}
-                r={isHovered ? 6 : 4}
-                fill="#ffffff"
-                stroke={revenueColor}
-                strokeWidth={isHovered ? 3 : 2}
-                className="transition-all duration-150 cursor-pointer"
-              />
-
-              {/* Interaction zone */}
-              <rect
-                x={x - plotWidth / (data.length * 2)}
-                y={paddingTop}
-                width={plotWidth / data.length}
-                height={plotHeight}
-                fill="transparent"
-                className="cursor-pointer"
-                onMouseEnter={() => setHoveredIdx(i)}
-                onMouseLeave={() => setHoveredIdx(null)}
-              />
-            </g>
-          );
-        })}
-      </svg>
-
-      {/* Hover tooltip with boundary clamp */}
-      {hoveredIdx !== null && data[hoveredIdx] && (
-        <div
-          className={`absolute z-30 pointer-events-none rounded-xl bg-slate-950/95 text-white p-3 text-xs shadow-2xl backdrop-blur-md border border-slate-700 whitespace-nowrap transition-all duration-75 ${
-            hoveredIdx >= data.length - 2
-              ? '-translate-x-full -translate-y-full ml-[-12px]'
-              : hoveredIdx <= 1
-              ? 'translate-x-0 -translate-y-full ml-[12px]'
-              : '-translate-x-1/2 -translate-y-full'
-          }`}
-          style={{
-            left: `${(getX(hoveredIdx) / width) * 100}%`,
-            top: `${Math.max(12, (getY(data[hoveredIdx].revenue) / height) * 100 - 4)}%`,
-          }}
-        >
-          <div className="font-semibold text-slate-200 border-b border-slate-700/80 pb-1.5 mb-1.5 flex items-center justify-between gap-3">
-            <span>{data[hoveredIdx].label}</span>
-            <span className="text-[10px] text-slate-400">Financial Summary</span>
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center justify-between gap-4 text-sky-400">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-sky-400" />
-                <span>Revenue</span>
-              </span>
-              <span className="font-mono font-semibold">
-                {data[hoveredIdx].revenue.toLocaleString()} MMK
-              </span>
+    <div ref={containerRef} className="relative w-full min-w-0">
+      {data.length === 0 ? (
+        <div className="flex items-center justify-center h-48 text-sm text-slate-400">No chart data available</div>
+      ) : (
+        <>
+          <svg viewBox={`0 0 ${width} ${height}`} style={{ height }} className="block w-full select-none" role="group" aria-label="Revenue and operating cost trend">
+            <title>Revenue and operating cost trend. Focus the plot and use arrow keys to inspect dates.</title>
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={revenueColor} stopOpacity="0.18" />
+                <stop offset="100%" stopColor={revenueColor} stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+              const y = paddingTop + plotHeight * (1 - ratio);
+              return (
+                <g key={ratio}>
+                  <line x1={paddingLeft} y1={y} x2={width - paddingRight} y2={y} strokeDasharray="3 5" className="stroke-slate-200 dark:stroke-slate-800" />
+                  <text x={paddingLeft - 10} y={y + 4} fontSize={11} textAnchor="end" className="fill-slate-400 font-mono">{compactAmount.format(chartMax * ratio)}</text>
+                </g>
+              );
+            })}
+            <path d={revenueArea} fill={`url(#${gradientId})`} />
+            <path d={expensePath} fill="none" stroke={expenseColor} strokeWidth="2" strokeDasharray="5 4" strokeLinejoin="round" />
+            <path d={revenuePath} fill="none" stroke={revenueColor} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+            {activeIndex !== null && (
+              <line x1={getX(activeIndex)} x2={getX(activeIndex)} y1={paddingTop} y2={paddingTop + plotHeight} stroke={revenueColor} strokeOpacity="0.35" strokeDasharray="3 4" />
+            )}
+            {data.map((point, index) => (
+              <g key={`${point.label}-${index}`}>
+                {tickIndices.has(index) && (
+                  <text x={getX(index)} y={height - 10} fontSize={11} textAnchor={data.length === 1 ? 'middle' : index === 0 ? 'start' : index === data.length - 1 ? 'end' : 'middle'} className="fill-slate-500 font-medium">
+                    {formatAxisDate(point.label)}
+                  </text>
+                )}
+                {(showDots || activeIndex === index) && (
+                  <>
+                    <circle cx={getX(index)} cy={getY(point.expense)} r={activeIndex === index ? 4 : 2.5} fill={expenseColor} />
+                    <circle cx={getX(index)} cy={getY(point.revenue)} r={activeIndex === index ? 5 : 3} fill="white" stroke={revenueColor} strokeWidth="2" />
+                  </>
+                )}
+              </g>
+            ))}
+            <rect
+              x={paddingLeft} y={paddingTop} width={plotWidth} height={plotHeight}
+              fill="transparent" className="cursor-crosshair outline-none focus:stroke-slate-400"
+              tabIndex={0} role="slider" aria-label="Inspect chart dates"
+              aria-valuemin={1} aria-valuemax={data.length} aria-valuenow={(activeIndex ?? 0) + 1}
+              aria-valuetext={activePoint ? `${activePoint.label}: revenue ${activePoint.revenue.toLocaleString()} MMK, operating cost ${activePoint.expense.toLocaleString()} MMK, net profit ${activePoint.profit.toLocaleString()} MMK` : data[0].label}
+              onPointerMove={inspectPointer} onPointerDown={inspectPointer}
+              onPointerLeave={(event) => { if (event.pointerType !== 'touch') setHoveredIdx(null); }}
+              onFocus={() => setHoveredIdx(0)} onBlur={() => setHoveredIdx(null)}
+              onKeyDown={(event) => {
+                if (!['ArrowLeft', 'ArrowRight', 'Home', 'End', 'Escape'].includes(event.key)) return;
+                event.preventDefault();
+                if (event.key === 'Escape') setHoveredIdx(null);
+                else if (event.key === 'Home') setHoveredIdx(0);
+                else if (event.key === 'End') setHoveredIdx(data.length - 1);
+                else setHoveredIdx(Math.max(0, Math.min(data.length - 1, (activeIndex ?? 0) + (event.key === 'ArrowRight' ? 1 : -1))));
+              }}
+            />
+          </svg>
+          {activePoint && activeIndex !== null && (
+            <div role="status" className="absolute top-0 z-30 pointer-events-none rounded-xl bg-slate-950/95 text-white p-3 text-xs shadow-xl border border-slate-700" style={{ width: tooltipWidth, left: Math.max(0, Math.min(width - tooltipWidth, getX(activeIndex) - tooltipWidth / 2)) }}>
+              <div className="font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-2">{activePoint.label}</div>
+              <div className="space-y-1.5">
+                <div className="flex justify-between gap-2"><span style={{ color: revenueColor }}>Revenue</span><span className="font-mono">{activePoint.revenue.toLocaleString()} MMK</span></div>
+                <div className="flex justify-between gap-2 text-slate-300"><span>Operating Cost</span><span className="font-mono">{activePoint.expense.toLocaleString()} MMK</span></div>
+                <div className="flex justify-between gap-2 text-emerald-400 border-t border-slate-700 pt-1.5"><span>Net Profit</span><span className="font-mono">{activePoint.profit.toLocaleString()} MMK</span></div>
+              </div>
             </div>
-            <div className="flex items-center justify-between gap-4 text-slate-300">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-slate-400" />
-                <span>Operating Cost</span>
-              </span>
-              <span className="font-mono font-semibold">
-                {data[hoveredIdx].expense.toLocaleString()} MMK
-              </span>
-            </div>
-            <div className="flex items-center justify-between gap-4 text-emerald-400 pt-1 border-t border-slate-800">
-              <span className="font-medium">Net Profit</span>
-              <span className="font-mono font-bold">
-                {data[hoveredIdx].profit.toLocaleString()} MMK
-              </span>
-            </div>
-          </div>
-        </div>
+          )}
+        </>
       )}
     </div>
   );

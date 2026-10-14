@@ -30,6 +30,7 @@ npm run start
 - `/demo/construction`
 - `/demo/real-estate`
 - `/demo/education`
+- `/demo/factory`
 
 The selected sector is also persisted locally, so standard workspace pages continue in that sector after navigation.
 
@@ -44,6 +45,7 @@ The selected sector is also persisted locally, so standard workspace pages conti
 | Construction | Projects, BOQ/materials, site teams |
 | Real Estate | Properties, leads, viewings, commissions |
 | Education & Training | Students, courses, fees, teachers |
+| Factory | Production orders, buyers, materials, equipment, factory shifts |
 
 ## Project map
 

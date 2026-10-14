@@ -87,7 +87,7 @@ export default function HRPage() {
     education: educationRoster,
   };
 
-  const staffRoster = rosterMap[currentIndustry.id] || genericRoster;
+  const staffRoster = currentIndustry.teamMembers ?? rosterMap[currentIndustry.id] ?? genericRoster;
   const activeStaff = staffRoster.filter((member) => member.status === 'Active').length;
   const coveredShifts = staffRoster.filter((member) => member.status !== 'Active').length;
   const departmentCount = new Set(staffRoster.map((member) => member.department)).size;
