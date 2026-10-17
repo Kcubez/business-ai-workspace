@@ -28,7 +28,6 @@ export default function DashboardOverviewPage() {
   const {
     currentIndustry,
     dateRangeLabel,
-    periodMode,
   } = useIndustry();
   const [sourceChartMode, setSourceChartMode] = useState<'pie' | 'bars'>('pie');
   const [queuePage, setQueuePage] = useState(1);
@@ -108,7 +107,7 @@ export default function DashboardOverviewPage() {
         >
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
             <span className="text-sm font-semibold">
-              {`Revenue (${periodMode.toUpperCase()})`}
+              Revenue
             </span>
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"

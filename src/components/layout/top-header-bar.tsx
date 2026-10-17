@@ -124,7 +124,6 @@ export function TopHeaderBar() {
 
       {/* Right Controls: Month Selector, Notification Bell, Theme Toggle */}
       <div className="flex items-center gap-2 sm:gap-2.5">
-        <span title="Fictional sample records for demonstration" className="hidden lg:inline-flex rounded-full border border-slate-200 px-2.5 py-1 text-[10px] font-semibold text-slate-500 dark:border-slate-700 dark:text-slate-400">Sample data</span>
         {/* Unified Period Filter Bar */}
         <DateFilterBar />
 

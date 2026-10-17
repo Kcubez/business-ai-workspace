@@ -35,7 +35,6 @@ function FinanceContent() {
     currentIndustry,
     addFinanceTransaction,
     deleteFinanceTransaction,
-    periodMode,
   } = useIndustry();
   const metrics = useReportingMetrics();
   const params = useSearchParams();
@@ -129,7 +128,7 @@ function FinanceContent() {
           style={{ borderLeftColor: currentIndustry.color }}
         >
           <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-500">
-            Total Revenue ({periodMode.toUpperCase()})
+            Total Revenue
           </span><MetricIcon icon={CircleDollarSign} color={currentIndustry.color} /></div>
           <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
             {scaledRevenue.toLocaleString()} MMK
@@ -145,7 +144,7 @@ function FinanceContent() {
           style={{ borderLeftColor: '#ef4444' }}
         >
           <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-500">
-            Operating Expenses ({periodMode.toUpperCase()})
+            Operating Expenses
           </span><MetricIcon icon={Wallet} color={'#ef4444'} /></div>
           <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
             {scaledExpense.toLocaleString()} MMK

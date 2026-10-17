@@ -69,7 +69,7 @@ Projects/Infrastructure, Customer Service, and Team include search, filters, cli
 
 ## Curated sample data
 
-All sectors use fictional sample organizations, illustrative prices, specific services, and dated records. These are not real customer records or live market prices. Monthly totals vary by deterministic seasonal factors; some months miss targets or exceed expense budgets so rule-based insights have meaningful evidence. Staff availability and completed/expiring assets have varied states. The header labels the workspace as sample data.
+All sectors use fictional sample organizations, illustrative prices, specific services, and dated records. These are not real customer records or live market prices. Monthly totals vary by deterministic seasonal factors; some months miss targets or exceed expense budgets so rule-based insights have meaningful evidence. Staff availability and completed/expiring assets have varied states.
 
 Browser data now uses `mot_custom_industry_data_v5`, storing only record upserts and removed IDs; unchanged sample history stays in source. A three-way migration compares v4 records to their legacy seed: untouched samples refresh, while saved edits, additions, intentional deletions, and emptied collections remain. Invalid collections fall back independently. The old cache is removed only after the new one saves successfully. Configuration, team rosters, and assets continue to come from the source. No backend or production integration was added.
 
