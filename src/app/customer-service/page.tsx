@@ -80,7 +80,7 @@ function CustomerServiceContent() {
       <p className="flex flex-wrap items-center gap-2 text-xs text-slate-500">Assessed as of {range.valid ? range.to : '—'}<button type="button" aria-label="About follow-up counts" title={`Includes currently outstanding follow-ups with due dates in ${range.label}. Assessed against the period end, not historical completion status.`} className="flex size-5 items-center justify-center rounded-full border border-slate-300 text-[11px] font-semibold dark:border-slate-700">i</button></p>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <button type="button" onClick={() => selectStatus('due_today')} aria-pressed={status === 'due_today'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#0ea5e9', boxShadow: status === 'due_today' ? '0 0 0 1px #0ea5e9' : undefined }}>
+        <button type="button" onClick={() => selectStatus('due_today')} aria-pressed={status === 'due_today'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#0ea5e9' }}>
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
             <span className="text-sm font-semibold ">Due at period end</span>
             <MetricIcon icon={Clock} color="#0ea5e9" />
@@ -93,7 +93,7 @@ function CustomerServiceContent() {
           </p>
         </button>
 
-        <button type="button" onClick={() => selectStatus('overdue')} aria-pressed={status === 'overdue'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#f43f5e', boxShadow: status === 'overdue' ? '0 0 0 1px #f43f5e' : undefined }}>
+        <button type="button" onClick={() => selectStatus('overdue')} aria-pressed={status === 'overdue'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#f43f5e' }}>
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
             <span className="text-sm font-semibold ">Overdue</span>
             <MetricIcon icon={AlertTriangle} color="#f43f5e" />
@@ -104,7 +104,7 @@ function CustomerServiceContent() {
           <p className="text-xs text-rose-500 font-medium leading-relaxed">Missed callback schedule</p>
         </button>
 
-        <button type="button" onClick={() => selectStatus('all')} aria-pressed={status === 'all'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#64748b', boxShadow: status === 'all' ? '0 0 0 1px #64748b' : undefined }}>
+        <button type="button" onClick={() => selectStatus('all')} aria-pressed={status === 'all'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#64748b' }}>
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
             <span className="text-sm font-semibold ">Outstanding in period</span>
             <MetricIcon icon={Calendar} color="#64748b" />

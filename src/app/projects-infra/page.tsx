@@ -142,7 +142,7 @@ export default function ProjectsInfraPage() {
 
 function AssetMetric({ label, value, detail, color, icon, onClick, selected }: { label: string; value: number; detail: string; color: string; icon: LucideIcon; onClick: () => void; selected: boolean }) {
   return (
-    <button type="button" onClick={onClick} aria-pressed={selected} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 rounded-2xl border border-slate-200 border-l-4 bg-white p-5 sm:p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900" style={{ borderLeftColor: color, boxShadow: selected ? `0 0 0 1px ${color}` : undefined }}>
+    <button type="button" onClick={onClick} aria-pressed={selected} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 rounded-2xl border border-slate-200 border-l-4 bg-white p-5 sm:p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900" style={{ borderLeftColor: color }}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{label}</p>
         <MetricIcon icon={icon} color={color} />
