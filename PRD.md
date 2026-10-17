@@ -44,7 +44,7 @@ Clinic, IT Services, Retail, Restaurant & Cafe, Construction, Real Estate, Educa
 - Sales funnel, source counts and table use one creation-date cohort. Amounts include quantity; new leads do not count as received income.
 - Undefined percentage denominators display an em dash; empty periods show no invented activity.
 - Budgets are inclusive calendar-prorated monthly plans, with actual percentages allowed above 100%.
-- The UI identifies demo reporting dates and snapshot-only content. AI briefs, undated queues and operational roster data are not represented as period-derived measurements.
+- The UI identifies demo reporting dates and snapshot-only content. Undated queues and operational roster data are not represented as period-derived measurements. Smart Suggestions and action briefs are rule-based calculations, not LLM output.
 
 - Every listed demo URL builds and renders.
 - Navigation and page headers match the selected sector.
@@ -54,3 +54,9 @@ Clinic, IT Services, Retail, Restaurant & Cafe, Construction, Real Estate, Educa
 ## Future phase triggers
 
 Move to a backend phase only after a client validates a sector and identifies the specific data sources/workflows they need. The first backend increment should model workspace, sector, users, and source records before AI or messaging integrations.
+
+## Record-based suggestions
+
+Existing Smart Suggestions, dashboard action briefs, and header notifications share `src/lib/insights.ts` through `useInsights()`. Rules flag selected-period expenses above the calendar-prorated budget, recorded income below the calendar-prorated target, and currently outstanding follow-ups due within the period before its end date. Follow-up counts use current completion state; there is no historical completion log. Customer Service uses the same deadline calculation and displays the reporting reference date. Completing a follow-up removes it through the existing context action and immediately recalculates suggestions.
+
+Review links filter existing Customer Service (`?filter=overdue`) and Finance (`?filter=income` or `?filter=expense`) tables. Filters can be cleared; finance KPIs retain the full reporting period. Financial rules use the shared metrics engine. Invalid periods produce no findings; empty periods can still show an income shortfall against a configured target. Suggestions are derived in memory and do not change cached record formats or require a backend. Static sector `aiBriefs` fixtures remain legacy configuration.

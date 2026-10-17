@@ -1,5 +1,8 @@
 'use client';
 
+import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
+import { MetricIcon } from '@/components/ui/metric-icon';
+import { BriefcaseBusiness, Activity, TriangleAlert, type LucideIcon } from 'lucide-react';
 import { useIndustry } from '@/context/industry-context';
 import { getSectorPageCopy } from '@/lib/sector-page-copy';
 
@@ -13,9 +16,9 @@ export default function ProjectsInfraPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <PageHeadingCopy>
+          <div className="flex flex-wrap items-center gap-2">
             <span
               className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white"
               style={{ backgroundColor: currentIndustry.color }}
@@ -27,16 +30,16 @@ export default function ProjectsInfraPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             {pageCopy.assetTitle}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             {pageCopy.assetSubtitle}
           </p>
-        </div>
+        </PageHeadingCopy>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <AssetMetric label="Tracked items" value={projectItems.length} detail="Across active operations" color={currentIndustry.color} />
-        <AssetMetric label="Active work" value={activeItems} detail="In progress or operational" color={currentIndustry.color} />
-        <AssetMetric label="Needs attention" value={expiringItems} detail={expiringItems === 0 ? 'No upcoming expiries' : 'Renewal action required'} color={expiringItems === 0 ? '#10b981' : '#f43f5e'} />
+        <AssetMetric icon={BriefcaseBusiness} label="Tracked items" value={projectItems.length} detail="Across active operations" color={currentIndustry.color} />
+        <AssetMetric icon={Activity} label="Active work" value={activeItems} detail="In progress or operational" color={currentIndustry.color} />
+        <AssetMetric icon={TriangleAlert} label="Needs attention" value={expiringItems} detail={expiringItems === 0 ? 'No upcoming expiries' : 'Renewal action required'} color={expiringItems === 0 ? '#10b981' : '#f43f5e'} />
       </div>
 
       <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
@@ -108,12 +111,15 @@ export default function ProjectsInfraPage() {
   );
 }
 
-function AssetMetric({ label, value, detail, color }: { label: string; value: number; detail: string; color: string }) {
+function AssetMetric({ label, value, detail, color, icon }: { label: string; value: number; detail: string; color: string; icon: LucideIcon }) {
   return (
-    <div className="rounded-2xl border border-slate-200 border-l-4 bg-white p-4 shadow-xs dark:border-slate-800 dark:bg-slate-900" style={{ borderLeftColor: color }}>
-      <p className="text-xs font-semibold text-slate-500">{label}</p>
-      <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{value}</p>
-      <p className="mt-1 text-xs font-medium" style={{ color }}>{detail}</p>
+    <div className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 rounded-2xl border border-slate-200 border-l-4 bg-white p-5 sm:p-6 shadow-xs dark:border-slate-800 dark:bg-slate-900" style={{ borderLeftColor: color }}>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">{label}</p>
+        <MetricIcon icon={icon} color={color} />
+      </div>
+      <p className="self-center text-2xl leading-tight tabular-nums tracking-tight font-bold text-slate-900 dark:text-white">{value}</p>
+      <p className="text-xs leading-relaxed font-medium" style={{ color }}>{detail}</p>
     </div>
   );
 }

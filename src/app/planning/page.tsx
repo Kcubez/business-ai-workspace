@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
 import { useIndustry } from '@/context/industry-context';
 import { CheckCircle2 } from 'lucide-react';
 
@@ -41,9 +42,9 @@ export default function PlanningPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <PageHeadingCopy>
+          <div className="flex flex-wrap items-center gap-2">
             <span
               className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white"
               style={{ backgroundColor: currentIndustry.color }}
@@ -55,10 +56,10 @@ export default function PlanningPage() {
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             AI 90-Day Operational Roadmap
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Contextual growth roadmap and cost-optimization recommendations generated for {currentIndustry.name}.
           </p>
-        </div>
+        </PageHeadingCopy>
       </div>
 
       <div className="space-y-4">

@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
 import { useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useIndustry } from '@/context/industry-context';
@@ -11,15 +12,15 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <PageHeadingCopy>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             Workspace Configuration
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Manage mock data environment and active industry parameters.
           </p>
-        </div>
+        </PageHeadingCopy>
       </div>
 
       <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">

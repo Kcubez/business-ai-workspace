@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
 import { useState } from 'react';
 import { useIndustry } from '@/context/industry-context';
 import { MultiSeriesLineChart, DonutPieChart } from '@/components/charts/premium-charts';
@@ -20,6 +21,8 @@ import { formatPercent, percentage, categoryShares } from '@/lib/metrics';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { SmartSuggestionsBanner } from '@/components/dashboard/smart-suggestions-banner';
 
+import { useInsights } from '@/lib/use-insights';
+
 export default function DashboardOverviewPage() {
   const {
     currentIndustry,
@@ -30,7 +33,8 @@ export default function DashboardOverviewPage() {
   const [queuePage, setQueuePage] = useState(1);
   const queuePageSize = 10;
 
-  const { queueItems, aiBriefs } = currentIndustry;
+  const { queueItems } = currentIndustry;
+  const { insights: aiBriefs } = useInsights();
   const metrics = useReportingMetrics();
   const shares = categoryShares(metrics.incomeCategories.map(item => item.value));
   const revenueSources = metrics.incomeCategories.map((item, index) => ({
@@ -63,26 +67,23 @@ export default function DashboardOverviewPage() {
   return (
     <div className="space-y-6">
       {/* Top Header Banner */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <PageHeadingCopy>
+          <div className="flex flex-wrap items-center gap-2">
             <span
               className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white"
               style={{ backgroundColor: currentIndustry.color }}
             >
               {currentIndustry.badge}
             </span>
-            <span className="text-xs text-slate-500 font-medium">
-               • <strong className="text-sky-600 dark:text-sky-400">{dateRangeLabel}</strong>
-            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             {currentIndustry.name} Overview
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             {currentIndustry.tagline}
           </p>
-        </div>
+        </PageHeadingCopy>
 
         {/* Planning Action Bar */}
         <div className="flex flex-wrap items-center gap-2.5">
@@ -101,11 +102,11 @@ export default function DashboardOverviewPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Metric 1 - Revenue */}
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
           style={{ borderLeftColor: currentIndustry.color }}
         >
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-            <span className="text-xs font-semibold">
+          <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
+            <span className="text-sm font-semibold">
               {`Revenue (${periodMode.toUpperCase()})`}
             </span>
             <div
@@ -118,11 +119,11 @@ export default function DashboardOverviewPage() {
               <CircleDollarSign className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums text-slate-900 dark:text-white tracking-tight">
             {scaledRevCard.toLocaleString()} MMK
           </div>
           <div
-            className="text-xs font-medium mt-1"
+            className="text-xs font-medium leading-relaxed"
             style={{ color: currentIndustry.color }}
           >
             {stats.revenueTodaySub}
@@ -131,11 +132,11 @@ export default function DashboardOverviewPage() {
 
         {/* Metric 2 - Primary Volume */}
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
           style={{ borderLeftColor: currentIndustry.color }}
         >
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-            <span className="text-xs font-semibold">{stats.primaryMetricTitle}</span>
+          <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
+            <span className="text-sm font-semibold">{stats.primaryMetricTitle}</span>
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
@@ -146,21 +147,21 @@ export default function DashboardOverviewPage() {
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums text-slate-900 dark:text-white tracking-tight">
             {scaledPrimaryCard.toLocaleString()}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
             {stats.primaryMetricSub}
           </div>
         </div>
 
         {/* Metric 3 - Secondary Metric */}
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
           style={{ borderLeftColor: currentIndustry.color }}
         >
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-            <span className="text-xs font-semibold">{stats.secondaryMetricTitle}</span>
+          <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
+            <span className="text-sm font-semibold">{stats.secondaryMetricTitle}</span>
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
@@ -171,21 +172,21 @@ export default function DashboardOverviewPage() {
               <Clock className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums text-slate-900 dark:text-white tracking-tight">
             {scaledSecondaryCard.toLocaleString()}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
             {stats.secondaryMetricSub}
           </div>
         </div>
 
         {/* Metric 4 - Efficiency */}
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs hover:border-slate-300 transition-all border-l-4"
           style={{ borderLeftColor: currentIndustry.color }}
         >
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-2">
-            <span className="text-xs font-semibold">{stats.efficiencyMetricTitle}</span>
+          <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
+            <span className="text-sm font-semibold">{stats.efficiencyMetricTitle}</span>
             <div
               className="w-8 h-8 rounded-lg flex items-center justify-center"
               style={{
@@ -196,10 +197,10 @@ export default function DashboardOverviewPage() {
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white tracking-tight">
+          <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums text-slate-900 dark:text-white tracking-tight">
             {stats.efficiencyMetricValue}
           </div>
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
             {stats.efficiencyMetricSub}
           </div>
         </div>
@@ -512,14 +513,15 @@ export default function DashboardOverviewPage() {
           <div className="flex items-center gap-2 mb-1 text-purple-600 dark:text-purple-400">
             <Bot className="w-5 h-5" />
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              AI Action Brief
+              Smart Action Brief
             </h3>
           </div>
           <p className="text-xs text-slate-500 mb-4">
-              Demo snapshot recommendations for {currentIndustry.name} · June 25, 2026
+              Rule-based suggestions for {currentIndustry.name}
           </p>
 
           <div className="space-y-3">
+            {aiBriefs.length === 0 && <p className="text-xs text-slate-500">No suggestions triggered by the current records and period.</p>}
             {aiBriefs.map((brief, i) => {
               const isUrgent = brief.severity === 'urgent';
               const isWarning = brief.severity === 'warning';

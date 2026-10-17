@@ -1,6 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
+import { Suspense, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { useIndustry } from '@/context/industry-context';
 import { MultiSeriesLineChart, DonutPieChart, PieSlice } from '@/components/charts/premium-charts';
 import { useReportingMetrics } from '@/lib/use-reporting-metrics';
@@ -8,33 +11,45 @@ import { formatPercent } from '@/lib/metrics';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { getSectorPageCopy } from '@/lib/sector-page-copy';
 import {
+  CircleDollarSign,
+  Wallet,
+  TrendingUp,
+  ReceiptText,
   ArrowUpRight,
   Plus,
   Trash2,
   X,
   PieChart,
 } from 'lucide-react';
+import { MetricIcon } from '@/components/ui/metric-icon';
 import { SmartSuggestionsBanner } from '@/components/dashboard/smart-suggestions-banner';
 
 export default function FinancePage() {
+  return <Suspense fallback={<p>Loading finance…</p>}><FinanceContent /></Suspense>;
+}
+
+function FinanceContent() {
   const {
     currentIndustry,
     addFinanceTransaction,
     deleteFinanceTransaction,
-    dateRangeLabel,
     periodMode,
   } = useIndustry();
   const metrics = useReportingMetrics();
+  const params = useSearchParams();
+  const requestedType = params.get('filter');
+  const transactionFilter = requestedType === 'income' || requestedType === 'expense' ? requestedType : null;
   const financeTransactions = metrics.transactions;
+  const filteredTransactions = financeTransactions.filter(t => !transactionFilter || t.type === transactionFilter);
   const [transactionDate, setTransactionDate] = useState('');
   const recordDate = transactionDate || (metrics.range.valid ? metrics.range.to : '');
   const pageCopy = getSectorPageCopy(currentIndustry.id);
 
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
-  const totalPages = Math.ceil(financeTransactions.length / pageSize) || 1;
+  const totalPages = Math.ceil(filteredTransactions.length / pageSize) || 1;
   const validPage = Math.min(currentPage, totalPages);
-  const paginatedTransactions = financeTransactions.slice((validPage - 1) * pageSize, validPage * pageSize);
+  const paginatedTransactions = filteredTransactions.slice((validPage - 1) * pageSize, validPage * pageSize);
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [title, setTitle] = useState('');
@@ -75,26 +90,23 @@ export default function FinancePage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <PageHeadingCopy>
+          <div className="flex flex-wrap items-center gap-2">
             <span
               className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white"
               style={{ backgroundColor: currentIndustry.color }}
             >
               {currentIndustry.name}
             </span>
-            <span className="text-xs text-slate-500 font-medium">
-              • <strong className="text-sky-600 dark:text-sky-400">{dateRangeLabel}</strong>
-            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             {pageCopy.financeTitle}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             P&L performance, operating cost distributions, and verified payment transactions.
           </p>
-        </div>
+        </PageHeadingCopy>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
@@ -111,58 +123,58 @@ export default function FinancePage() {
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
           style={{ borderLeftColor: currentIndustry.color }}
         >
-          <span className="text-xs font-semibold text-slate-500">
+          <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-500">
             Total Revenue ({periodMode.toUpperCase()})
-          </span>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1">
+          </span><MetricIcon icon={CircleDollarSign} color={currentIndustry.color} /></div>
+          <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
             {scaledRevenue.toLocaleString()} MMK
           </div>
-          <div className="flex items-center gap-1 text-xs font-semibold mt-1" style={{ color: currentIndustry.color }}>
+          <div className="flex items-center gap-1 text-xs font-medium leading-relaxed" style={{ color: currentIndustry.color }}>
             <ArrowUpRight className="w-3.5 h-3.5" />
             <span>Target: {scaledSalesTarget.toLocaleString()} MMK</span>
           </div>
         </div>
 
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
           style={{ borderLeftColor: '#ef4444' }}
         >
-          <span className="text-xs font-semibold text-slate-500">
+          <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-500">
             Operating Expenses ({periodMode.toUpperCase()})
-          </span>
-          <div className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white mt-1">
+          </span><MetricIcon icon={Wallet} color={'#ef4444'} /></div>
+          <div className="self-center break-words text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
             {scaledExpense.toLocaleString()} MMK
           </div>
-          <div className="flex items-center gap-1 text-xs text-slate-400 font-medium mt-1">
+          <div className="flex items-center gap-1 text-xs text-slate-400 font-medium leading-relaxed">
             <span>Budget: {scaledExpenseBudget.toLocaleString()} MMK</span>
           </div>
         </div>
 
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
           style={{ borderLeftColor: netProfit >= 0 ? '#10b981' : '#f43f5e' }}
         >
-          <span className="text-xs font-semibold text-slate-500">Net Profit</span>
-          <div className={`text-xl sm:text-2xl font-bold mt-1 ${netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
+          <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-500">Net Profit</span><MetricIcon icon={TrendingUp} color={netProfit >= 0 ? '#10b981' : '#f43f5e'} /></div>
+          <div className={`self-center break-words text-2xl font-bold leading-tight tabular-nums tracking-tight ${netProfit >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600'}`}>
             {netProfit.toLocaleString()} MMK
           </div>
-          <div className="text-xs text-slate-400 font-medium mt-1">
+          <div className="text-xs text-slate-400 font-medium leading-relaxed">
             Margin: {formatPercent(margin)}
           </div>
         </div>
 
         <div
-          className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
+          className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs border-l-4"
           style={{ borderLeftColor: currentIndustry.color }}
         >
-          <span className="text-xs font-semibold text-slate-500">Recorded Transactions</span>
-          <div className="text-2xl font-bold text-slate-900 dark:text-white mt-1">
+          <div className="flex items-center justify-between gap-3"><span className="text-sm font-semibold text-slate-500">Recorded Transactions</span><MetricIcon icon={ReceiptText} color={currentIndustry.color} /></div>
+          <div className="self-center text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
             {financeTransactions.length}
           </div>
-          <div className="text-xs text-emerald-600 font-medium mt-1">
+          <div className="text-xs text-emerald-600 font-medium leading-relaxed">
             In selected reporting period
           </div>
         </div>
@@ -233,18 +245,19 @@ export default function FinancePage() {
       </div>
 
       {/* Transaction Records Table */}
-      <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+      <div id="transaction-records" className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
               Recent Financial Transactions
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
-              Recorded income and expenses ({financeTransactions.length} entries)
+              Recorded {transactionFilter || "income and expenses"} ({filteredTransactions.length} entries)
             </p>
           </div>
         </div>
 
+        {transactionFilter && <div className="mb-4 flex items-center gap-3 text-sm"><span>Showing {transactionFilter} records · Summary metrics cover all period transactions.</span><Link href="/finance#transaction-records" className="text-sky-600 underline">Clear filter</Link></div>}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
@@ -303,7 +316,7 @@ export default function FinancePage() {
         {/* 10-row Table Pagination */}
         <TablePagination
           currentPage={validPage}
-          totalItems={financeTransactions.length}
+          totalItems={filteredTransactions.length}
           pageSize={pageSize}
           onPageChange={setCurrentPage}
         />

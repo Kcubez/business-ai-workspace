@@ -111,3 +111,29 @@ test('independent fixture: creation cohort, quantity, denominator and finance is
   assert.equal(withoutPayment.revenue, 0); assert.equal(withoutPayment.profit, -400);
   assert.equal(withoutPayment.leads, 2);
 });
+
+const { calculateInsights, followUpsForPeriod } = loadTs('src/lib/insights.ts');
+test('suggestions reconcile to evidence, resolve after mutations, and exclude out-of-period rows', () => {
+  const seed = { ...seeds.clinic, targets: { ...seeds.clinic.targets, salesTarget: 1000, expenseBudget: 500 },
+    customerFollowUps: [
+      { ...seeds.clinic.customerFollowUps[0], id: 'late', dueDate: '2026-06-10' },
+      { ...seeds.clinic.customerFollowUps[0], id: 'end', dueDate: '2026-06-30' },
+      { ...seeds.clinic.customerFollowUps[0], id: 'outside', dueDate: '2026-07-01' },
+    ], financeTransactions: [
+      { ...seeds.clinic.financeTransactions[0], id: 'income', date: '2026-06-10', type: 'income', amount: 200 },
+      { ...seeds.clinic.financeTransactions[0], id: 'expense', date: '2026-06-10', type: 'expense', amount: 600 },
+      { ...seeds.clinic.financeTransactions[0], id: 'outside-tx', date: '2026-07-01', type: 'income', amount: 10000 },
+    ] };
+  const insights = calculateInsights(seed, range({}));
+  assert.equal(insights.length, 3);
+  assert.deepEqual(insights.find(i => i.id === 'overdue-follow-ups').recordIds, ['late']);
+  assert.deepEqual(followUpsForPeriod(seed, range({})).filter(f => f.dueStatus === 'overdue').map(f => f.id), ['late']);
+  assert.match(insights.find(i => i.id === 'income-below-target').description, /800 MMK remaining/);
+  assert.deepEqual(insights.find(i => i.id === 'expenses-above-budget').recordIds, ['expense']);
+  const resolved = { ...seed, customerFollowUps: seed.customerFollowUps.slice(1), financeTransactions: [
+    { ...seed.financeTransactions[0], amount: 1000 }, { ...seed.financeTransactions[1], amount: 500 },
+  ] };
+  assert.deepEqual(calculateInsights(resolved, range({})), []);
+  assert.deepEqual(calculateInsights(seed, range({ periodMode: 'custom', customFrom: '', customTo: '' })), []);
+  assert.deepEqual(calculateInsights({ ...resolved, targets: { ...seed.targets, salesTarget: 0, expenseBudget: 0 } }, range({})), []);
+});

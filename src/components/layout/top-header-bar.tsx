@@ -18,10 +18,12 @@ import {
 import Link from 'next/link';
 import { DateFilterBar } from '@/components/dashboard/date-filter-bar';
 
+import { useInsights } from '@/lib/use-insights';
+
 export function TopHeaderBar() {
   const { currentIndustry } = useIndustry();
 
-  const aiBriefs = currentIndustry.aiBriefs || [];
+  const { insights: aiBriefs } = useInsights();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -162,6 +164,7 @@ export function TopHeaderBar() {
             </div>
 
             <div className="max-h-80 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800">
+              {aiBriefs.length === 0 && <p className="p-4 text-xs text-slate-500">No suggestions triggered for this period.</p>}
               {(aiBriefs || []).map((brief, idx) => {
                 const isRead = readBriefs.includes(brief.title);
                 return (

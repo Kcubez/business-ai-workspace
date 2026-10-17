@@ -1,5 +1,6 @@
 'use client';
 
+import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
 import { useReportingMetrics } from '@/lib/use-reporting-metrics';
 import { formatPercent, demandDate } from '@/lib/metrics';
 import { useState } from 'react';
@@ -24,7 +25,6 @@ export default function SalesMarketingPage() {
     addDemandRecord,
     updateDemandRecord,
     deleteDemandRecord,
-    dateRangeLabel,
   } = useIndustry();
   const metrics = useReportingMetrics();
   const demandRecords = metrics.demands;
@@ -173,26 +173,23 @@ export default function SalesMarketingPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-4 border-b border-slate-200 dark:border-slate-800">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 pb-6 border-b border-slate-200 dark:border-slate-800">
+        <PageHeadingCopy>
+          <div className="flex flex-wrap items-center gap-2">
             <span
               className="text-[11px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full text-white shadow-xs"
               style={{ backgroundColor: currentIndustry.color }}
             >
               {currentIndustry.name}
             </span>
-            <span className="text-xs text-slate-400 font-medium">
-            • <strong className="text-sky-600 dark:text-sky-400">{dateRangeLabel}</strong>
-            </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
             {pageCopy.salesTitle}
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             Full conversion funnel tracking from leads to closed contracts for {currentIndustry.name}.
           </p>
-        </div>
+        </PageHeadingCopy>
 
         <div className="flex flex-wrap items-center gap-2.5">
           <button
@@ -223,42 +220,42 @@ export default function SalesMarketingPage() {
               Current stage of records created in the selected period; quoted, pending and closed records count as qualified.
             </p>
 
-            <div className="grid flex-1 grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3 sm:grid-rows-[1fr_auto_1fr]">
               <div
-                className="flex flex-col justify-center p-4 sm:min-h-36 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center border-l-4 shadow-2xs"
+                className="grid min-h-44 grid-rows-[1fr_auto_1fr] gap-y-3 p-5 sm:row-span-3 sm:grid-rows-subgrid rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center border-l-4 shadow-2xs"
                 style={{ borderLeftColor: currentIndustry.color }}
               >
-                <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: currentIndustry.color }}>
+                <span className="self-end text-sm leading-5 font-semibold " style={{ color: currentIndustry.color }}>
                   1. Inbound Leads
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+                <div className="text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
                   {scaledLeads}
                 </div>
-                <p className="text-[10px] text-slate-500 mt-1">
+                <p className="self-start text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">
                   Records created in period
                 </p>
               </div>
 
-              <div className="flex flex-col justify-center p-4 sm:min-h-36 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center relative border-l-4 border-l-amber-500 shadow-2xs">
-                <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+              <div className="grid min-h-44 grid-rows-[1fr_auto_1fr] gap-y-3 p-5 sm:row-span-3 sm:grid-rows-subgrid rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center relative border-l-4 border-l-amber-500 shadow-2xs">
+                <span className="self-end text-sm leading-5 font-semibold text-amber-600 dark:text-amber-400 ">
                   2. Quoted or Beyond
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+                <div className="text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
                   {scaledAppointments}
                 </div>
-                <p className="text-[10px] text-amber-600 dark:text-amber-400 font-semibold mt-1">
+                <p className="self-start text-xs text-amber-600 dark:text-amber-400 font-medium leading-relaxed">
                   {formatPercent(metrics.conversion)} Qualified
                 </p>
               </div>
 
-              <div className="flex flex-col justify-center p-4 sm:min-h-36 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center border-l-4 border-l-emerald-500 shadow-2xs">
-                <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+              <div className="grid min-h-44 grid-rows-[1fr_auto_1fr] gap-y-3 p-5 sm:row-span-3 sm:grid-rows-subgrid rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center border-l-4 border-l-emerald-500 shadow-2xs">
+                <span className="self-end text-sm leading-5 font-semibold text-emerald-600 dark:text-emerald-400 ">
                   3. Closed Deals
                 </span>
-                <div className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mt-1">
+                <div className="text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
                   {scaledClosed}
                 </div>
-                <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold mt-1">
+                <p className="self-start text-xs text-emerald-600 dark:text-emerald-400 font-medium leading-relaxed">
                   {formatPercent(metrics.closeRate)} Close Rate
                 </p>
               </div>
