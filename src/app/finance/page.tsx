@@ -1,11 +1,13 @@
 'use client';
 
+import { CategoryBarChart } from '@/components/charts/category-bar-chart';
+import { NetProfitChart } from '@/components/charts/net-profit-chart';
 import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useIndustry } from '@/context/industry-context';
-import { MultiSeriesLineChart, DonutPieChart, PieSlice } from '@/components/charts/premium-charts';
+import { MultiSeriesLineChart, PieSlice } from '@/components/charts/premium-charts';
 import { useReportingMetrics } from '@/lib/use-reporting-metrics';
 import { formatPercent } from '@/lib/metrics';
 import { TablePagination } from '@/components/ui/table-pagination';
@@ -187,10 +189,10 @@ function FinanceContent() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         {/* Financial Trend Visualizer */}
         <div className="lg:col-span-7 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Financial Progression Curve
+                Revenue & Expenses
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 Recorded totals by date; longer periods grouped by month
@@ -209,16 +211,17 @@ function FinanceContent() {
           </div>
           <MultiSeriesLineChart
             data={scaledTrend}
+            range={metrics.range}
             revenueColor={currentIndustry.color}
             expenseColor="#94a3b8"
-            height={220}
+            height={240}
           />
         </div>
 
         {/* Expense Category Donut Pie Chart */}
         <div className="lg:col-span-5 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
               <div className="flex items-center gap-2">
                 <PieChart className="w-4 h-4 text-rose-500" />
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -233,16 +236,20 @@ function FinanceContent() {
               Operational spend allocation across key cost centers
             </p>
 
-            <DonutPieChart
+            <div role="region" aria-label="Cost breakdown categories" tabIndex={0} className="h-60 overflow-y-auto overscroll-contain pr-2 focus-visible:outline-2 focus-visible:outline-sky-500 rounded-lg">
+            <CategoryBarChart
               data={metrics.expenseCategories.map((item, i): PieSlice => ({
                 ...item, color: ['#f43f5e', '#f59e0b', '#8b5cf6', '#64748b', '#0ea5e9'][i % 5],
               }))}
-              size={150} innerRadiusRatio={0.62} unit="MMK"
+              unit="MMK"
             />
+            </div>
 
           </div>
         </div>
       </div>
+
+      <NetProfitChart transactions={financeTransactions} />
 
       {/* Transaction Records Table */}
       <div id="transaction-records" className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">

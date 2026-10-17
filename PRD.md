@@ -60,3 +60,18 @@ Move to a backend phase only after a client validates a sector and identifies th
 Existing Smart Suggestions, dashboard action briefs, and header notifications share `src/lib/insights.ts` through `useInsights()`. Rules flag selected-period expenses above the calendar-prorated budget, recorded income below the calendar-prorated target, and currently outstanding follow-ups due within the period before its end date. Follow-up counts use current completion state; there is no historical completion log. Customer Service uses the same deadline calculation and displays the reporting reference date. Completing a follow-up removes it through the existing context action and immediately recalculates suggestions.
 
 Review links filter existing Customer Service (`?filter=overdue`) and Finance (`?filter=income` or `?filter=expense`) tables. Filters can be cleared; finance KPIs retain the full reporting period. Financial rules use the shared metrics engine. Invalid periods produce no findings; empty periods can still show an income shortfall against a configured target. Suggestions are derived in memory and do not change cached record formats or require a backend. Static sector `aiBriefs` fixtures remain legacy configuration.
+
+
+## Operational record views
+
+Projects/Infrastructure, Customer Service, and Team include search, filters, clickable KPI shortcuts, and compact insight panels pairing clickable status, overdue-aging, or department bar charts with priority review lists. Register titles come from sector page copy. Register attention includes non-completed items flagged Expiring Soon or due within 30 days of the selected reporting end; register rows themselves are not period-filtered. Follow-up aging (1–7, 8–14, 15+ days) uses currently outstanding records due within the reporting period, assessed at its end, and preserves overdue deep links. Team availability reflects roster status only; workload and confirmed shift coverage are not inferred. Filtering is local UI state and follow-up completion continues through IndustryProvider actions.
+
+
+## Curated sample data
+
+All sectors use fictional sample organizations, illustrative prices, specific services, and dated records. These are not real customer records or live market prices. Monthly totals vary by deterministic seasonal factors; some months miss targets or exceed expense budgets so rule-based insights have meaningful evidence. Staff availability and completed/expiring assets have varied states. The header labels the workspace as sample data.
+
+Browser data now uses `mot_custom_industry_data_v5`, storing only record upserts and removed IDs; unchanged sample history stays in source. A three-way migration compares v4 records to their legacy seed: untouched samples refresh, while saved edits, additions, intentional deletions, and emptied collections remain. Invalid collections fall back independently. The old cache is removed only after the new one saves successfully. Configuration, team rosters, and assets continue to come from the source. No backend or production integration was added.
+
+
+Trend charts use calendar spacing. Nonempty reporting periods include zero recorded totals on days/months without ledger rows, labeled “No recorded transactions” in the tooltip; entirely empty periods still show an empty state. Monthly aggregates span the first through last month positions, so December aligns with the final tick rather than leaving a December-to-month-end gap. This describes recorded demo ledger activity, not external feed completeness.

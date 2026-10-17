@@ -1,3 +1,4 @@
+import { curateIndustry } from './curated-demo-data';
 import { INDUSTRIES, IndustryConfig, IndustryId } from '@/data/industries';
 import {
   EXTENDED_DEMAND_RECORDS,
@@ -6,7 +7,7 @@ import {
   EXTENDED_QUEUE_ITEMS,
 } from '@/data/mock-extended-data';
 
-export function getEnrichedIndustries(): Record<IndustryId, IndustryConfig> {
+export function getLegacyEnrichedIndustries(): Record<IndustryId, IndustryConfig> {
   const result = { ...INDUSTRIES };
 
   (Object.keys(result) as IndustryId[]).forEach((id) => {
@@ -269,4 +270,9 @@ function generateAugmentedQueue(base: IndustryConfig): IndustryConfig['queueItem
   }
 
   return extended;
+}
+
+export function getEnrichedIndustries(): Record<IndustryId, IndustryConfig> {
+  const legacy = getLegacyEnrichedIndustries();
+  return Object.fromEntries((Object.keys(INDUSTRIES) as IndustryId[]).map(id => [id, curateIndustry(INDUSTRIES[id], legacy[id])])) as Record<IndustryId, IndustryConfig>;
 }

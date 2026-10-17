@@ -88,6 +88,7 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const { currentIndustry, currentIndustryId, setIndustryId, allIndustries, isHydrated } = useIndustry();
+  const sortedIndustries = [...allIndustries].sort((a, b) => a.name.localeCompare(b.name, 'en'));
   const { user, logout } = useAuth();
 
   // If on login page, render children without sidebar shell
@@ -209,7 +210,7 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
                   Select Industry Workspace
                 </p>
                 <div className="space-y-1">
-                  {allIndustries.map((ind) => {
+                  {sortedIndustries.map((ind) => {
                     const IndIcon = industryIcons[ind.icon] || Database;
                     const isSelected = ind.id === currentIndustryId;
                     return (
@@ -419,7 +420,7 @@ export function DashboardLayoutClient({ children }: { children: React.ReactNode 
                 Switch Business Sector
               </DropdownMenuLabel>
               <DropdownMenuSeparator className="bg-slate-800" />
-              {allIndustries.map((ind) => {
+              {sortedIndustries.map((ind) => {
                 const IndIcon = industryIcons[ind.icon] || Database;
                 const isSelected = ind.id === currentIndustryId;
                 return (

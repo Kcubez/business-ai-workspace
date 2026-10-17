@@ -73,13 +73,25 @@ export function calculateMetrics(industry: IndustryConfig, range: ReportingRange
   };
   const channels = new Map<string, number>();
   demands.forEach(r => channels.set(r.sourceChannel || 'Direct', (channels.get(r.sourceChannel || 'Direct') ?? 0) + 1));
-  const buckets = new Map<string, { label: string; revenue: number; expense: number; profit: number }>();
+  const buckets = new Map<string, { label: string; revenue: number; expense: number; profit: number; hasRecords: boolean }>();
   const monthly = range.valid && (Date.parse(range.to) - Date.parse(range.from)) / DAY > 62;
+  // These are recorded ledger totals: a date with no rows has zero recorded activity.
+  // Entirely empty periods still return no chart data.
+  if (transactions.length && range.valid) {
+    const cursor = new Date(`${monthly ? `${range.from.slice(0, 7)}-01` : range.from}T00:00:00Z`);
+    const end = Date.parse(`${range.to}T00:00:00Z`);
+    while (cursor.getTime() <= end) {
+      const label = cursor.toISOString().slice(0, monthly ? 7 : 10);
+      buckets.set(label, { label, revenue: 0, expense: 0, profit: 0, hasRecords: false });
+      if (monthly) cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+      else cursor.setUTCDate(cursor.getUTCDate() + 1);
+    }
+  }
   transactions.forEach(t => {
     const key = monthly ? t.date.slice(0, 7) : t.date;
-    const point = buckets.get(key) ?? { label: key, revenue: 0, expense: 0, profit: 0 };
+    const point = buckets.get(key) ?? { label: key, revenue: 0, expense: 0, profit: 0, hasRecords: false };
     if (t.type === 'income') point.revenue += t.amount; else point.expense += t.amount;
-    point.profit = point.revenue - point.expense; buckets.set(key, point);
+    point.profit = point.revenue - point.expense; point.hasRecords = true; buckets.set(key, point);
   });
   return {
     transactions, demands, revenue, expense, profit, margin: percentage(profit, revenue),

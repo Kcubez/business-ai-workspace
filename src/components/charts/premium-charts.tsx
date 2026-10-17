@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useId, useRef, useState, type PointerEvent } from 'react';
+import { chartTimeAxis } from '@/lib/chart-time-axis';
+import type { ReportingRange } from '@/lib/metrics';
 import { categoryShares } from '@/lib/metrics';
 
 interface ChartPoint {
@@ -8,6 +10,7 @@ interface ChartPoint {
   revenue: number;
   expense: number;
   profit: number;
+  hasRecords?: boolean;
 }
 
 const compactAmount = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
@@ -26,11 +29,13 @@ export function MultiSeriesLineChart({
   revenueColor = '#0ea5e9',
   expenseColor = '#64748b',
   height = 240,
+  range,
 }: {
   data: ChartPoint[];
   revenueColor?: string;
   expenseColor?: string;
   height?: number;
+  range?: ReportingRange;
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const gradientId = useId();
@@ -56,7 +61,8 @@ export function MultiSeriesLineChart({
   const maxVal = data.reduce((max, point) => Math.max(max, point.revenue, point.expense), 1);
   const magnitude = 10 ** Math.floor(Math.log10(maxVal));
   const chartMax = Math.ceil(maxVal * 1.1 / magnitude) * magnitude;
-  const getX = (index: number) => paddingLeft + (data.length === 1 ? 0.5 : index / (data.length - 1)) * plotWidth;
+  const timeAxis = chartTimeAxis(data.map(point => point.label), plotWidth, range);
+  const getX = (index: number) => paddingLeft + (timeAxis?.positions[index] ?? (data.length === 1 ? 0.5 : index / (data.length - 1))) * plotWidth;
   const getY = (value: number) => paddingTop + plotHeight - value / chartMax * plotHeight;
   const tickCount = Math.min(data.length, Math.max(2, Math.floor(plotWidth / 85) + 1));
   const tickIndices = new Set(Array.from({ length: tickCount }, (_, index) =>
@@ -71,7 +77,10 @@ export function MultiSeriesLineChart({
   const inspectPointer = (event: PointerEvent<SVGRectElement>) => {
     const bounds = event.currentTarget.getBoundingClientRect();
     const position = (event.clientX - bounds.left) / bounds.width;
-    setHoveredIdx(Math.max(0, Math.min(data.length - 1, Math.round(position * (data.length - 1)))));
+    if (timeAxis) {
+      const nearest = timeAxis.positions.reduce((best, point, index) => Math.abs(point - position) < Math.abs(timeAxis.positions[best] - position) ? index : best, 0);
+      setHoveredIdx(nearest);
+    } else setHoveredIdx(Math.max(0, Math.min(data.length - 1, Math.round(position * (data.length - 1)))));
   };
 
   return (
@@ -81,7 +90,7 @@ export function MultiSeriesLineChart({
       ) : (
         <>
           <svg viewBox={`0 0 ${width} ${height}`} style={{ height }} className="block w-full select-none" role="group" aria-label="Revenue and operating cost trend">
-            <title>Revenue and operating cost trend. Focus the plot and use arrow keys to inspect dates.</title>
+            <desc>Revenue and operating cost trend. Focus the plot and use arrow keys to inspect recorded dates. Dates without ledger rows show zero recorded activity.</desc>
             <defs>
               <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor={revenueColor} stopOpacity="0.18" />
@@ -103,9 +112,12 @@ export function MultiSeriesLineChart({
             {activeIndex !== null && (
               <line x1={getX(activeIndex)} x2={getX(activeIndex)} y1={paddingTop} y2={paddingTop + plotHeight} stroke={revenueColor} strokeOpacity="0.35" strokeDasharray="3 4" />
             )}
+            {timeAxis?.ticks.map((tick) => (
+              <text key={tick.time} x={paddingLeft + tick.position * plotWidth} y={height - 10} fontSize={11} textAnchor={tick.position < 0.04 ? 'start' : tick.position > 0.96 ? 'end' : 'middle'} className="fill-slate-500 font-medium">{tick.label}</text>
+            ))}
             {data.map((point, index) => (
               <g key={`${point.label}-${index}`}>
-                {tickIndices.has(index) && (
+                {!timeAxis && tickIndices.has(index) && (
                   <text x={getX(index)} y={height - 10} fontSize={11} textAnchor={data.length === 1 ? 'middle' : index === 0 ? 'start' : index === data.length - 1 ? 'end' : 'middle'} className="fill-slate-500 font-medium">
                     {formatAxisDate(point.label)}
                   </text>
@@ -138,12 +150,13 @@ export function MultiSeriesLineChart({
             />
           </svg>
           {activePoint && activeIndex !== null && (
-            <div role="status" className="absolute top-0 z-30 pointer-events-none rounded-xl bg-slate-950/95 text-white p-3 text-xs shadow-xl border border-slate-700" style={{ width: tooltipWidth, left: Math.max(0, Math.min(width - tooltipWidth, getX(activeIndex) - tooltipWidth / 2)) }}>
+            <div role="status" className="absolute top-0 z-30 pointer-events-none rounded-xl bg-slate-950 text-white p-3 text-xs shadow-xl border border-slate-700" style={{ width: tooltipWidth, left: Math.max(0, Math.min(width - tooltipWidth, getX(activeIndex) - tooltipWidth / 2)) }}>
               <div className="font-semibold text-slate-200 border-b border-slate-700 pb-2 mb-2">{activePoint.label}</div>
               <div className="space-y-1.5">
+                {activePoint.hasRecords === false && <p className="pb-1 text-slate-400">No recorded transactions</p>}
                 <div className="flex justify-between gap-2"><span style={{ color: revenueColor }}>Revenue</span><span className="font-mono">{activePoint.revenue.toLocaleString()} MMK</span></div>
                 <div className="flex justify-between gap-2 text-slate-300"><span>Operating Cost</span><span className="font-mono">{activePoint.expense.toLocaleString()} MMK</span></div>
-                <div className="flex justify-between gap-2 text-emerald-400 border-t border-slate-700 pt-1.5"><span>Net Profit</span><span className="font-mono">{activePoint.profit.toLocaleString()} MMK</span></div>
+                <div className={`flex justify-between gap-2 border-t border-slate-700 pt-1.5 ${activePoint.profit < 0 ? 'text-rose-400' : 'text-emerald-400'}`}><span>Net Profit</span><span className="font-mono">{activePoint.profit.toLocaleString()} MMK</span></div>
               </div>
             </div>
           )}
@@ -168,6 +181,8 @@ export function DonutPieChart({
   centerSub,
   unit = 'leads',
   stacked = false,
+  compact = false,
+  legendMaxHeight,
 }: {
   data: PieSlice[];
   size?: number;
@@ -176,6 +191,8 @@ export function DonutPieChart({
   centerSub?: string;
   unit?: string;
   stacked?: boolean;
+  compact?: boolean;
+  legendMaxHeight?: number;
 }) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
@@ -222,6 +239,8 @@ export function DonutPieChart({
   });
 
   return (
+    <div className="w-full min-w-0">
+      {unit === 'MMK' && <p className="mb-5 text-sm font-semibold tabular-nums text-slate-900 dark:text-white">Total: {total.toLocaleString()} MMK</p>}
     <div className={`flex ${stacked ? 'flex-col' : 'flex-col sm:flex-row'} items-center gap-5 select-none w-full`}>
       <div className="relative shrink-0 my-1" style={{ width: size, height: size }}>
         <svg viewBox={"0 0 " + size + " " + size} className="w-full h-full overflow-visible">
@@ -256,7 +275,7 @@ export function DonutPieChart({
                 {shares[hoveredIdx]}%
               </span>
               <span className="text-[10px] text-slate-500 font-mono truncate max-w-[95px]">
-                {data[hoveredIdx].value.toLocaleString()} {unit}
+                {compactAmount.format(data[hoveredIdx].value)} {unit}
               </span>
             </>
           ) : (
@@ -265,7 +284,7 @@ export function DonutPieChart({
                 {centerTitle || 'Total'}
               </span>
               <span className="text-lg font-extrabold text-slate-900 dark:text-white font-mono leading-tight">
-                {total.toLocaleString()}{unit === '%' ? '%' : ''}
+                {compactAmount.format(total)}{unit === '%' ? '%' : ''}
               </span>
               <span className="text-[10px] text-slate-400 font-medium truncate max-w-[100px]">
                 {centerSub || 'Distribution'}
@@ -275,40 +294,30 @@ export function DonutPieChart({
         </div>
       </div>
 
-      {/* Legend & Breakdown List */}
-      <div className="space-y-1.5 flex-1 w-full min-w-0 max-h-[185px] overflow-y-auto pr-1 custom-scrollbar">
-        {slices.map((s, i) => {
-          const isHovered = hoveredIdx === i;
-          return (
-            <div
-              key={i}
-              onMouseEnter={() => setHoveredIdx(i)}
-              onMouseLeave={() => setHoveredIdx(null)}
-              className={
-                "flex items-center justify-between p-1.5 sm:p-2 rounded-xl transition-all cursor-pointer text-xs " +
-                (isHovered ? "bg-slate-100 dark:bg-slate-800/80 shadow-xs" : "hover:bg-slate-50 dark:hover:bg-slate-800/40")
-              }
+      {/* Full labels and values remain visible at narrow widths. */}
+      <ul aria-label="Chart categories" tabIndex={legendMaxHeight ? 0 : undefined} style={legendMaxHeight ? { maxHeight: legendMaxHeight, overflowY: 'auto' } : undefined} className={`w-full min-w-0 flex-1 ${compact ? 'space-y-1' : 'space-y-3'}`}>
+        {slices.map((slice, index) => (
+          <li key={slice.name}>
+            <button type="button"
+              onMouseEnter={() => setHoveredIdx(index)} onMouseLeave={() => setHoveredIdx(null)}
+              onFocus={() => setHoveredIdx(index)} onBlur={() => setHoveredIdx(null)}
+              onClick={() => setHoveredIdx(hoveredIdx === index ? null : index)}
+              aria-pressed={hoveredIdx === index}
+              className={`w-full rounded-lg ${compact ? 'p-1' : 'p-2'} text-left text-xs transition-colors hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-500 dark:hover:bg-slate-800`}
             >
-              <div className="flex items-center gap-2 min-w-0 flex-1 mr-2">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: s.color }} />
-                <span className="font-medium text-slate-800 dark:text-slate-200 truncate text-[11px] sm:text-xs">
-                  {s.name}
+              <span className="flex items-start justify-between gap-3">
+                <span className="flex min-w-0 items-start gap-2 font-medium text-slate-700 dark:text-slate-200">
+                  <span className="mt-1 size-2.5 shrink-0 rounded-full" style={{ backgroundColor: slice.color }} aria-hidden="true" />
+                  <span className="break-words">{slice.name}</span>
                 </span>
-              </div>
-              <div className="flex items-center gap-2 font-mono shrink-0">
-                {unit !== '%' && (
-                  <span className="text-slate-400 font-medium text-[10px] hidden sm:inline">
-                    {s.value.toLocaleString()} {unit}
-                  </span>
-                )}
-                <span className="font-bold text-slate-900 dark:text-white min-w-[2.25rem] text-right text-[11px] sm:text-xs">
-                  {s.percent}%
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+                <span className="shrink-0 font-semibold tabular-nums text-slate-900 dark:text-white">{slice.percent}%</span>
+              </span>
+              {unit !== '%' && <span className="mt-1 block pl-4.5 tabular-nums text-slate-500 dark:text-slate-400">{slice.value.toLocaleString()} {unit}</span>}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
     </div>
   );
 }

@@ -220,46 +220,19 @@ export default function SalesMarketingPage() {
               Current stage of records created in the selected period; quoted, pending and closed records count as qualified.
             </p>
 
-            <div className="grid flex-1 grid-cols-1 gap-3 sm:grid-cols-3 sm:grid-rows-[1fr_auto_1fr]">
-              <div
-                className="grid min-h-44 grid-rows-[1fr_auto_1fr] gap-y-3 p-5 sm:row-span-3 sm:grid-rows-subgrid rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center border-l-4 shadow-2xs"
-                style={{ borderLeftColor: currentIndustry.color }}
-              >
-                <span className="self-end text-sm leading-5 font-semibold " style={{ color: currentIndustry.color }}>
-                  1. Inbound Leads
-                </span>
-                <div className="text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
-                  {scaledLeads}
-                </div>
-                <p className="self-start text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">
-                  Records created in period
-                </p>
-              </div>
-
-              <div className="grid min-h-44 grid-rows-[1fr_auto_1fr] gap-y-3 p-5 sm:row-span-3 sm:grid-rows-subgrid rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center relative border-l-4 border-l-amber-500 shadow-2xs">
-                <span className="self-end text-sm leading-5 font-semibold text-amber-600 dark:text-amber-400 ">
-                  2. Quoted or Beyond
-                </span>
-                <div className="text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
-                  {scaledAppointments}
-                </div>
-                <p className="self-start text-xs text-amber-600 dark:text-amber-400 font-medium leading-relaxed">
-                  {formatPercent(metrics.conversion)} Qualified
-                </p>
-              </div>
-
-              <div className="grid min-h-44 grid-rows-[1fr_auto_1fr] gap-y-3 p-5 sm:row-span-3 sm:grid-rows-subgrid rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200 dark:border-slate-800 text-center border-l-4 border-l-emerald-500 shadow-2xs">
-                <span className="self-end text-sm leading-5 font-semibold text-emerald-600 dark:text-emerald-400 ">
-                  3. Closed Deals
-                </span>
-                <div className="text-2xl font-bold leading-tight tabular-nums tracking-tight text-slate-900 dark:text-white">
-                  {scaledClosed}
-                </div>
-                <p className="self-start text-xs text-emerald-600 dark:text-emerald-400 font-medium leading-relaxed">
-                  {formatPercent(metrics.closeRate)} Close Rate
-                </p>
-              </div>
-            </div>
+            <ol className="grid flex-1 grid-cols-1 content-center gap-3 py-2 sm:grid-cols-3" aria-label="Sales conversion funnel">
+              {[
+                { label: '1. Inbound Leads', value: scaledLeads, detail: 'Records created in period', color: currentIndustry.color },
+                { label: '2. Quoted or Beyond', value: scaledAppointments, detail: `${formatPercent(metrics.conversion)} of inbound qualified`, color: '#f59e0b' },
+                { label: '3. Closed Deals', value: scaledClosed, detail: `${formatPercent(metrics.closeRate)} of qualified closed`, color: '#10b981' },
+              ].map(stage => (
+                <li key={stage.label} className="grid min-h-44 grid-rows-[2.5rem_auto_2.5rem] content-center gap-3 rounded-xl border border-slate-200 border-l-4 bg-slate-50/70 p-4 text-center dark:border-slate-800 dark:bg-slate-800/40" style={{ borderLeftColor: stage.color }}>
+                  <span className="self-end text-sm font-semibold leading-5" style={{ color: stage.color }}>{stage.label}</span>
+                  <span className="text-2xl font-bold leading-tight tracking-tight tabular-nums text-slate-900 dark:text-white">{stage.value.toLocaleString()}</span>
+                  <p className="text-xs font-medium leading-relaxed text-slate-500 dark:text-slate-400">{stage.detail}</p>
+                </li>
+              ))}
+            </ol>
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-slate-500">
@@ -288,7 +261,7 @@ export default function SalesMarketingPage() {
 
             {channelPieData.length > 0 ? (
               <div className="flex flex-1 items-center justify-center">
-                <DonutPieChart data={channelPieData} size={150} innerRadiusRatio={0.62} />
+                <DonutPieChart data={channelPieData} size={150} compact legendMaxHeight={200} />
               </div>
             ) : (
               <div className="py-12 text-center text-xs text-slate-400">
@@ -298,7 +271,7 @@ export default function SalesMarketingPage() {
           </div>
 
           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs text-slate-500">
-            <span>Primary: <strong className="text-slate-800 dark:text-slate-200">{channelPieData[0]?.name || '—'}</strong></span>
+            <span>Primary: <strong className="text-slate-800 dark:text-slate-200">{[...channelPieData].sort((a, b) => b.value - a.value)[0]?.name || '—'}</strong></span>
             <span>Channel Diversity: <strong className="text-slate-800 dark:text-slate-200">{channelPieData.length} Sources</strong></span>
           </div>
         </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { MonthComparisonChart } from '@/components/charts/month-comparison-chart';
 import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
 import { useState } from 'react';
 import { useIndustry } from '@/context/industry-context';
@@ -271,10 +272,10 @@ export default function DashboardOverviewPage() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Full-width financial trend */}
         <div className="lg:col-span-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs flex flex-col justify-between">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white">
-                Revenue vs Operating Cost Trend
+                Revenue & Expenses
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 Recorded financial totals for {dateRangeLabel}
@@ -290,21 +291,24 @@ export default function DashboardOverviewPage() {
               </div>
               <div className="flex items-center gap-1.5 font-medium text-slate-600 dark:text-slate-300">
                 <span className="w-2.5 h-2.5 rounded-full bg-slate-400" />
-                <span>Operating Cost</span>
+                <span>Expenses</span>
               </div>
             </div>
           </div>
 
           <MultiSeriesLineChart
             data={scaledTrend}
+            range={metrics.range}
             revenueColor={currentIndustry.color}
             expenseColor="#94a3b8"
           />
         </div>
 
+        <MonthComparisonChart industry={currentIndustry} range={metrics.range} />
+
         {/* Revenue Sources */}
-        <div className="self-start p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
-          <div>
+        <div className="flex min-w-0 flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex-1">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white">
@@ -361,6 +365,8 @@ export default function DashboardOverviewPage() {
                       color: colors[idx % colors.length],
                     };
                   })}
+                  legendMaxHeight={200}
+                  compact
                   size={140}
                   innerRadiusRatio={0.62}
                   centerTitle="Revenue"
@@ -369,15 +375,15 @@ export default function DashboardOverviewPage() {
                 />
               </div>
             ) : (
-              <div className="space-y-4">
+              <div role="region" aria-label="Revenue source comparison" tabIndex={0} className="max-h-64 space-y-4 overflow-y-auto pr-2 overscroll-contain">
                 {revenueSources.map((item) => (
                   <div key={item.name} className="space-y-1.5">
-                    <div className="flex items-center justify-between text-xs">
+                    <div className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
                       <div className="flex items-center gap-2 min-w-0">
                         <span className="w-5 h-5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center font-bold text-[10px] shrink-0">
                           {item.rank}
                         </span>
-                        <span className="font-semibold text-slate-800 dark:text-slate-200 truncate">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 break-words">
                           {item.name}
                         </span>
                       </div>
@@ -410,7 +416,7 @@ export default function DashboardOverviewPage() {
                   <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
                     Top source
                   </p>
-                  <p className="mt-1 truncate text-xs font-bold text-slate-800 dark:text-slate-100">
+                  <p className="mt-1 break-words text-xs font-bold text-slate-800 dark:text-slate-100">
                     {primaryRevenueSource.name}
                   </p>
                 </div>
@@ -509,9 +515,9 @@ export default function DashboardOverviewPage() {
         </div>
 
         {/* AI Action Briefs */}
-        <div className="lg:order-2 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs self-start">
-          <div className="flex items-center gap-2 mb-1 text-purple-600 dark:text-purple-400">
-            <Bot className="w-5 h-5" />
+        <div className="lg:order-2 flex min-w-0 flex-col p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center gap-2 mb-1">
+            <Bot className="w-5 h-5" style={{ color: currentIndustry.color }} />
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
               Smart Action Brief
             </h3>
@@ -520,7 +526,7 @@ export default function DashboardOverviewPage() {
               Rule-based suggestions for {currentIndustry.name}
           </p>
 
-          <div className="space-y-3">
+          <div role="region" aria-label="Smart action briefs" tabIndex={0} className="max-h-80 space-y-3 overflow-y-auto pr-1 overscroll-contain">
             {aiBriefs.length === 0 && <p className="text-xs text-slate-500">No suggestions triggered by the current records and period.</p>}
             {aiBriefs.map((brief, i) => {
               const isUrgent = brief.severity === 'urgent';
@@ -564,10 +570,11 @@ export default function DashboardOverviewPage() {
             })}
           </div>
 
-          {/* Button right below the briefs with no empty gap */}
+          {/* Keep the roadmap action close to its supporting messages. */}
           <Link
             href="/planning"
-            className="mt-4 w-full py-2.5 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold text-center flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+            className="mt-3 w-full shrink-0 py-2.5 rounded-xl text-white text-xs font-bold text-center flex items-center justify-center gap-1.5 hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+            style={{ backgroundColor: currentIndustry.color }}
           >
             <span>Open Full 90-Day AI Roadmap</span>
             <ArrowRight className="w-3.5 h-3.5" />

@@ -24,6 +24,15 @@ export interface SidebarGroup {
   items: { title: string; href: string; icon: SidebarIcon }[];
 }
 
+export interface DemoProfile {
+  organizations: string[];
+  services: { name: string; category: string; price: number; quantity: number; followUp: string; note: string }[];
+  expenses: { category: string; title: string; supplier: string; weight: number }[];
+  seasonalFactors: number[];
+  queueStages: string[];
+  queueStations: string[];
+}
+
 export interface IndustryConfig {
   id: IndustryId;
   name: string;
@@ -32,6 +41,7 @@ export interface IndustryConfig {
   icon: string;
   color: string;
   sidebarGroups: SidebarGroup[];
+  demoProfile: DemoProfile;
   teamMembers?: {
     name: string;
     role: string;
@@ -124,6 +134,7 @@ export interface IndustryConfig {
     amount: number;
     paymentMethod: string;
     reference: string;
+    demandRecordId?: string;
   }[];
   customerFollowUps: {
     id: string;
@@ -134,6 +145,7 @@ export interface IndustryConfig {
     dueStatus: 'due_today' | 'overdue' | 'upcoming';
     dueDate: string;
     notes: string;
+    demandRecordId?: string;
   }[];
   projectItems: {
     id: string;
@@ -149,6 +161,121 @@ export interface IndustryConfig {
 export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
   factory: {
     id: 'factory',
+    demoProfile: {
+      "organizations": [
+            "Thazin Packaging Supply",
+            "Nilar Food Products",
+            "Golden Tamarind Distribution",
+            "Aye Chan Consumer Goods"
+      ],
+      "services": [
+            {
+                  "name": "Corrugated shipping carton batch",
+                  "category": "Packaging Revenue",
+                  "price": 185000,
+                  "quantity": 10,
+                  "followUp": "Approve carton print proof",
+                  "note": "Buyer requested a revised shipping mark before production."
+            },
+            {
+                  "name": "Food-grade pouch production",
+                  "category": "Flexible Packaging",
+                  "price": 245000,
+                  "quantity": 8,
+                  "followUp": "Confirm pouch material sample",
+                  "note": "Quality team is checking the seal strength sample."
+            },
+            {
+                  "name": "Printed retail sleeve batch",
+                  "category": "Print Revenue",
+                  "price": 165000,
+                  "quantity": 6,
+                  "followUp": "Approve retail sleeve artwork",
+                  "note": "Artwork approval is required before plate preparation."
+            },
+            {
+                  "name": "Industrial label production",
+                  "category": "Label Revenue",
+                  "price": 125000,
+                  "quantity": 12,
+                  "followUp": "Confirm label roll specification",
+                  "note": "Buyer requested the core size and adhesive specification."
+            },
+            {
+                  "name": "Custom protective insert batch",
+                  "category": "Packaging Revenue",
+                  "price": 210000,
+                  "quantity": 5,
+                  "followUp": "Review protective insert sample",
+                  "note": "Confirm the product dimensions before tool setup."
+            },
+            {
+                  "name": "Repeat export carton order",
+                  "category": "Export Revenue",
+                  "price": 195000,
+                  "quantity": 16,
+                  "followUp": "Confirm export carton dispatch",
+                  "note": "Arrange pallet labels and loading-window confirmation."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Raw Materials",
+                  "title": "Paperboard and packaging film restock",
+                  "supplier": "Thazin Materials Supply",
+                  "weight": 48
+            },
+            {
+                  "category": "Labour",
+                  "title": "Production and quality payroll",
+                  "supplier": "Factory payroll",
+                  "weight": 25
+            },
+            {
+                  "category": "Utilities",
+                  "title": "Factory electricity and water",
+                  "supplier": "Facilities account",
+                  "weight": 13
+            },
+            {
+                  "category": "Maintenance",
+                  "title": "Press and cutting-line maintenance",
+                  "supplier": "PlantCare Services",
+                  "weight": 9
+            },
+            {
+                  "category": "Transport & Packaging",
+                  "title": "Pallets and dispatch transport",
+                  "supplier": "Dispatch partner",
+                  "weight": 5
+            }
+      ],
+      "seasonalFactors": [
+            0.92,
+            0.98,
+            1.13,
+            0.78,
+            1.02,
+            1.07,
+            1.12,
+            1.04,
+            1.09,
+            1.13,
+            1.17,
+            1.21
+      ],
+      "queueStages": [
+            "Ready for dispatch",
+            "In production",
+            "Quality review",
+            "Artwork hold"
+      ],
+      "queueStations": [
+            "Cutting line",
+            "Printing line",
+            "Packing line"
+      ]
+},
     name: 'Factory',
     tagline: 'Production orders, factory costs, materials, and equipment performance.',
     badge: 'Manufacturing Enterprise',
@@ -164,10 +291,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Factory Finance', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     teamMembers: [
       { name: 'U Aung Min', role: 'Factory Manager', department: 'Operations', status: 'Active', shifts: 'Full Day' },
@@ -251,10 +380,138 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'factory-asset-3', name: 'Food Container Mould — Line 1', category: 'Production Tooling', status: 'Active', expiryDate: '2026-12-15', owner: 'Ko Htet Naing', value: '18,000,000 MMK' },
       { id: 'factory-asset-4', name: 'Finished Goods Warehouse', category: 'Storage & Dispatch', status: 'Active', expiryDate: '2026-11-30', owner: 'U Aung Min', value: '35,000,000 MMK' },
       { id: 'factory-asset-5', name: 'Line 3 Preventive Maintenance', category: 'Maintenance', status: 'In Progress', expiryDate: '2026-07-10', owner: 'Ko Wai Yan', value: '2,400,000 MMK' },
+      {"id": "fa-refresh-1", "name": "Carton cutting line preventive service", "category": "Maintenance", "status": "Expiring Soon", "expiryDate": "2026-06-28", "owner": "Maintenance Lead", "value": "1,650,000 MMK"},
+      {"id": "fa-refresh-2", "name": "Export carton print proof approval", "category": "Quality Control", "status": "Completed", "expiryDate": "2026-06-22", "owner": "Quality Lead", "value": "950,000 MMK"},
     ],
   },
   clinic: {
     id: 'clinic',
+    teamMembers: [
+    { name: 'Dr. Aye Myat', role: 'Head of Clinical Services', department: 'Operations', status: 'Active', shifts: 'Morning Shift' },
+    { name: 'Dr. Nandar Win', role: 'Senior Dental Surgeon', department: 'Specialists', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ma Hnin Yu', role: 'Chief Pharmacist', department: 'Pharmacy', status: 'Active', shifts: 'Evening Shift' },
+    { name: 'Ko Min Zaw', role: 'IT Systems & HMS Lead', department: 'Technology', status: 'Active', shifts: 'Flexible' },
+    { name: 'Daw San San', role: 'Triage Receptionist', department: 'Front Desk', status: 'On Leave', shifts: 'Covered' },
+    {"name": "Nurse Hnin Ei", "role": "Senior Outpatient Nurse", "department": "Nursing", "status": "Active", "shifts": "Morning Shift"},
+    {"name": "Nurse May Thu", "role": "Vaccination Nurse", "department": "Nursing", "status": "Active", "shifts": "Evening Shift"},
+    {"name": "Ko Zaw Lin", "role": "Laboratory Technician", "department": "Diagnostics", "status": "Active", "shifts": "Full Day"},
+    {"name": "Ma Ei Mon", "role": "Patient Care Coordinator", "department": "Front Desk", "status": "Active", "shifts": "Evening Shift"},
+  ],
+    demoProfile: {
+      "organizations": [
+            "Thazin Trading Staff Clinic",
+            "Aye Chan Engineering",
+            "Nilar Family Care",
+            "Golden Tamarind Foods"
+      ],
+      "services": [
+            {
+                  "name": "Executive health screening",
+                  "category": "Medical Revenue",
+                  "price": 185000,
+                  "quantity": 1,
+                  "followUp": "Confirm screening appointment",
+                  "note": "Confirm fasting instructions and preferred appointment time."
+            },
+            {
+                  "name": "Corporate staff screening",
+                  "category": "Corporate Contract",
+                  "price": 125000,
+                  "quantity": 12,
+                  "followUp": "Confirm staff screening roster",
+                  "note": "HR has requested staggered appointments to keep office cover."
+            },
+            {
+                  "name": "Dental cleaning and review",
+                  "category": "Dental Revenue",
+                  "price": 95000,
+                  "quantity": 1,
+                  "followUp": "Review dental appointment",
+                  "note": "Patient requested an evening appointment after work."
+            },
+            {
+                  "name": "Laboratory screening panel",
+                  "category": "Lab Revenue",
+                  "price": 68000,
+                  "quantity": 1,
+                  "followUp": "Confirm laboratory report collection",
+                  "note": "Send collection instructions once the report is ready."
+            },
+            {
+                  "name": "Ultrasound consultation",
+                  "category": "Radiology Revenue",
+                  "price": 85000,
+                  "quantity": 1,
+                  "followUp": "Confirm ultrasound booking",
+                  "note": "Patient prefers the morning consultation slot."
+            },
+            {
+                  "name": "Vaccination follow-up",
+                  "category": "Pharmacy Revenue",
+                  "price": 55000,
+                  "quantity": 1,
+                  "followUp": "Confirm next vaccination visit",
+                  "note": "Check availability before confirming the next visit."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Medical Supplies",
+                  "title": "Disposable examination supplies",
+                  "supplier": "Thazin Medical Supply",
+                  "weight": 32
+            },
+            {
+                  "category": "Lab & Diagnostics",
+                  "title": "Reagent and sample-tube replenishment",
+                  "supplier": "Nilar Lab Supply",
+                  "weight": 18
+            },
+            {
+                  "category": "Payroll & HR",
+                  "title": "Clinical and reception payroll",
+                  "supplier": "Staff payroll",
+                  "weight": 28
+            },
+            {
+                  "category": "Facility Operations",
+                  "title": "Clinic rent and utilities",
+                  "supplier": "Facilities account",
+                  "weight": 14
+            },
+            {
+                  "category": "Equipment Maintenance",
+                  "title": "Ultrasound preventive maintenance",
+                  "supplier": "CareTech Services",
+                  "weight": 8
+            }
+      ],
+      "seasonalFactors": [
+            0.94,
+            0.9,
+            1.04,
+            0.82,
+            1.02,
+            1.09,
+            1.12,
+            1.06,
+            1.03,
+            0.98,
+            1.01,
+            1.08
+      ],
+      "queueStages": [
+            "Checked in",
+            "Scheduled",
+            "Awaiting confirmation",
+            "Reschedule needed"
+      ],
+      "queueStations": [
+            "Dr. Aye Myat · General medicine",
+            "Dr. Nandar Win · Dental",
+            "Nurse Hnin Ei · Screening"
+      ]
+},
     name: 'Clinic & Healthcare',
     tagline: 'Patient flow, clinic operations, and medical financial intelligence.',
     badge: 'Medical Enterprise',
@@ -270,10 +527,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Finance', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     stats: {
       revenueToday: '3,840,000 MMK',
@@ -465,11 +724,136 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'pj-c2', name: 'Hospital Management Software (HMS)', category: 'IT Infrastructure', status: 'Active', expiryDate: '2026-12-31', owner: 'IT Dept', value: '4,200,000 MMK' },
       { id: 'pj-c3', name: 'Oxygen Concentrator Maintenance', category: 'Life Support Equipment', status: 'Active', expiryDate: '2026-09-15', owner: 'Facility Team', value: '380,000 MMK' },
       { id: 'pj-c4', name: 'Emergency Backup Generator Service', category: 'Facility Power', status: 'Active', expiryDate: '2026-10-01', owner: 'Operations Team', value: '520,000 MMK' },
+      {"id": "cl-refresh-1", "name": "Outpatient sterilizer service", "category": "Equipment Maintenance", "status": "Expiring Soon", "expiryDate": "2026-06-28", "owner": "Maintenance Lead", "value": "1,850,000 MMK"},
+      {"id": "cl-refresh-2", "name": "Reception queue display upgrade", "category": "IT Systems", "status": "Completed", "expiryDate": "2026-06-12", "owner": "IT Systems Lead", "value": "480,000 MMK"},
+      {"id": "cl-refresh-3", "name": "Vaccination refrigerator inspection", "category": "Cold Chain", "status": "Active", "expiryDate": "2026-08-15", "owner": "Head of Nursing", "value": "2,450,000 MMK"},
     ],
   },
 
   agency: {
     id: 'agency',
+    teamMembers: [
+    { name: 'Ko Thura Zaw', role: 'Head of Engineering & AI', department: 'Technical Delivery', status: 'Active', shifts: 'Flexible' },
+    { name: 'Daw Ei Phyu', role: 'Senior Project Delivery Manager', department: 'Client Delivery', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ko Min Khant', role: 'Lead Full-Stack Developer', department: 'Engineering', status: 'Active', shifts: 'Flexible' },
+    { name: 'Ma Su Myat', role: 'UI/UX Product Designer', department: 'Design Studio', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ko Aung Phyo', role: 'Cloud Infrastructure & DevOps', department: 'Operations', status: 'Active', shifts: 'On-Call' },
+    {"name": "Ma Ei Mon", "role": "Account Coordinator", "department": "Client Delivery", "status": "On Leave", "shifts": "Full Day"},
+  ],
+    demoProfile: {
+      "organizations": [
+            "Thazin Retail Studio",
+            "Nilar Learning Hub",
+            "Golden Tamarind Hospitality",
+            "Aye Chan Engineering"
+      ],
+      "services": [
+            {
+                  "name": "Website discovery and prototype",
+                  "category": "Web Development",
+                  "price": 850000,
+                  "quantity": 1,
+                  "followUp": "Review website prototype",
+                  "note": "Client requested a simpler booking journey on mobile."
+            },
+            {
+                  "name": "Monthly content production",
+                  "category": "Content Retainer",
+                  "price": 650000,
+                  "quantity": 1,
+                  "followUp": "Approve next content calendar",
+                  "note": "Waiting for approval of the product photography brief."
+            },
+            {
+                  "name": "E-commerce storefront build",
+                  "category": "E-commerce",
+                  "price": 2400000,
+                  "quantity": 1,
+                  "followUp": "Review storefront proposal",
+                  "note": "Scope includes catalog migration and delivery-zone rules."
+            },
+            {
+                  "name": "CRM workflow setup",
+                  "category": "Automation",
+                  "price": 1250000,
+                  "quantity": 1,
+                  "followUp": "Confirm CRM workflow scope",
+                  "note": "Sales team asked for lead assignment and callback reminders."
+            },
+            {
+                  "name": "Brand identity package",
+                  "category": "Design Services",
+                  "price": 780000,
+                  "quantity": 1,
+                  "followUp": "Approve brand direction",
+                  "note": "Two design directions are ready for the stakeholder review."
+            },
+            {
+                  "name": "Hosting and support retainer",
+                  "category": "Support Retainer",
+                  "price": 180000,
+                  "quantity": 1,
+                  "followUp": "Confirm support renewal",
+                  "note": "Renewal includes monitoring and monthly maintenance."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Payroll & Contractors",
+                  "title": "Delivery team and contractor fees",
+                  "supplier": "Delivery payroll",
+                  "weight": 60
+            },
+            {
+                  "category": "Software Subscriptions",
+                  "title": "Design and collaboration tools",
+                  "supplier": "Workspace subscriptions",
+                  "weight": 16
+            },
+            {
+                  "category": "Cloud Infrastructure",
+                  "title": "Hosting and backup services",
+                  "supplier": "Cloud services",
+                  "weight": 10
+            },
+            {
+                  "category": "Marketing",
+                  "title": "Portfolio campaign and creative production",
+                  "supplier": "Studio marketing",
+                  "weight": 8
+            },
+            {
+                  "category": "Office Operations",
+                  "title": "Internet and office utilities",
+                  "supplier": "Facilities account",
+                  "weight": 6
+            }
+      ],
+      "seasonalFactors": [
+            0.87,
+            0.92,
+            1.04,
+            0.78,
+            1.08,
+            1.02,
+            1.12,
+            0.96,
+            1.09,
+            1.14,
+            1.08,
+            1.16
+      ],
+      "queueStages": [
+            "Delivered",
+            "In production",
+            "Client review",
+            "Scope clarification"
+      ],
+      "queueStations": [
+            "Design team",
+            "Delivery team"
+      ]
+},
     name: 'Digital Agency & IT Services',
     tagline: 'Client demand pipeline, retainers, and software project telemetry.',
     badge: 'Technology Services',
@@ -485,10 +869,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Finance', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     stats: {
       revenueToday: '5,250,000 MMK',
@@ -680,11 +1066,136 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'pj-a2', name: 'Zaw Electronics E-Commerce Cloud Server', category: 'Cloud VPS', status: 'Expiring Soon', expiryDate: '2026-07-01', owner: 'DevOps Lead', value: '1,200,000 MMK' },
       { id: 'pj-a3', name: 'Royal Clinic Patient App (iOS/Android)', category: 'Mobile App', status: 'Active', expiryDate: '2026-09-30', owner: 'Product Manager', value: '9,800,000 MMK' },
       { id: 'pj-a4', name: 'Shwe Myanmar Travel SSL Certificate', category: 'Security & Cert', status: 'Active', expiryDate: '2026-11-20', owner: 'Security Team', value: '250,000 MMK' },
+      {"id": "ag-refresh-1", "name": "Nilar Learning Hub booking website", "category": "Client Delivery", "status": "In Progress", "expiryDate": "2026-07-18", "owner": "Project Delivery Manager", "value": "2,400,000 MMK"},
+      {"id": "ag-refresh-2", "name": "Studio backup verification", "category": "Cloud Services", "status": "Completed", "expiryDate": "2026-06-19", "owner": "DevOps Lead", "value": "250,000 MMK"},
     ],
   },
 
   retail: {
     id: 'retail',
+    teamMembers: [
+    { name: 'Daw May Thazin', role: 'Store General Manager', department: 'Retail Operations', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ko Kyaw Swar', role: 'Inventory & Warehouse Lead', department: 'Stock Management', status: 'Active', shifts: 'Morning Shift' },
+    { name: 'Ma Cherry Moe', role: 'Senior Cashier & POS Lead', department: 'Front Counter', status: 'Active', shifts: 'Day Shift' },
+    { name: 'Ko Hein Thu', role: 'Visual Merchandiser', department: 'Floor Display', status: 'Active', shifts: 'Flexible' },
+    { name: 'Daw Nu Nu Win', role: 'Customer Care & Returns Specialist', department: 'After-Sales Desk', status: 'Active', shifts: 'Evening Shift' },
+    { name: 'Ko Lin Htet', role: 'Courier Dispatch Coordinator', department: 'Fulfillment & Logistics', status: 'Active', shifts: 'Morning Shift' },
+    {"name": "Ma Ei Mon", "role": "Order Packing Associate", "department": "Fulfillment", "status": "Active", "shifts": "Evening Shift"},
+    {"name": "Ko Zaw Lin", "role": "Stockroom Associate", "department": "Warehouse", "status": "On Leave", "shifts": "Morning Shift"},
+  ],
+    demoProfile: {
+      "organizations": [
+            "Thazin Corner Store",
+            "Nilar Home Goods",
+            "Golden Tamarind Mart",
+            "Aye Chan Distribution"
+      ],
+      "services": [
+            {
+                  "name": "Household essentials carton",
+                  "category": "Household Goods",
+                  "price": 38000,
+                  "quantity": 4,
+                  "followUp": "Confirm household order delivery",
+                  "note": "Customer requested delivery after 4 PM."
+            },
+            {
+                  "name": "Skincare gift set",
+                  "category": "Personal Care",
+                  "price": 42500,
+                  "quantity": 2,
+                  "followUp": "Confirm gift-set availability",
+                  "note": "Reserve the fragrance-free variant before collecting payment."
+            },
+            {
+                  "name": "Kitchen storage bundle",
+                  "category": "Home & Kitchen",
+                  "price": 56000,
+                  "quantity": 1,
+                  "followUp": "Confirm kitchen bundle dispatch",
+                  "note": "Customer prefers combined delivery for all items."
+            },
+            {
+                  "name": "Office pantry restock",
+                  "category": "Wholesale Revenue",
+                  "price": 28500,
+                  "quantity": 10,
+                  "followUp": "Confirm pantry restock quantities",
+                  "note": "Buyer requested a single invoice for the monthly restock."
+            },
+            {
+                  "name": "Reusable lunchbox set",
+                  "category": "Home & Kitchen",
+                  "price": 18500,
+                  "quantity": 3,
+                  "followUp": "Resolve lunchbox exchange",
+                  "note": "Check the returned lid fit before arranging replacement."
+            },
+            {
+                  "name": "Weekend grocery bundle",
+                  "category": "Grocery Sales",
+                  "price": 32000,
+                  "quantity": 2,
+                  "followUp": "Confirm grocery collection",
+                  "note": "Collect at the counter during the evening pickup window."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Stock Procurement",
+                  "title": "Merchandise restock",
+                  "supplier": "Thazin Wholesale Supply",
+                  "weight": 62
+            },
+            {
+                  "category": "Payroll & HR",
+                  "title": "Store and fulfillment payroll",
+                  "supplier": "Staff payroll",
+                  "weight": 16
+            },
+            {
+                  "category": "Delivery & Packaging",
+                  "title": "Courier runs and packing materials",
+                  "supplier": "Parcel partner",
+                  "weight": 10
+            },
+            {
+                  "category": "Facility Operations",
+                  "title": "Shop lease and utilities",
+                  "supplier": "Facilities account",
+                  "weight": 9
+            },
+            {
+                  "category": "Marketing",
+                  "title": "Weekend promotion materials",
+                  "supplier": "Store marketing",
+                  "weight": 3
+            }
+      ],
+      "seasonalFactors": [
+            0.91,
+            0.95,
+            1.12,
+            1.18,
+            0.94,
+            0.98,
+            1.02,
+            1.05,
+            1.04,
+            1.09,
+            1.14,
+            1.25
+      ],
+      "queueStages": [
+            "Ready for pickup",
+            "Packing",
+            "Awaiting payment",
+            "Address confirmation"
+      ],
+      "queueStations": [
+            "Fulfillment desk"
+      ]
+},
     name: 'Retail & Multi-store E-commerce',
     tagline: 'Order volumes, SKU profitability, stock turns, and delivery logistics.',
     badge: 'Commerce & Omnichannel',
@@ -700,10 +1211,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Finance', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     stats: {
       revenueToday: '8,420,000 MMK',
@@ -895,11 +1408,137 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'pj-r2', name: 'E-commerce POS Barcode Scanner Hardware', category: 'Store POS Infra', status: 'Active', expiryDate: '2026-08-15', owner: 'Store Ops', value: '1,800,000 MMK' },
       { id: 'pj-r3', name: 'Mandalay Distribution Hub Lease Agreement', category: 'Logistics Facility', status: 'Expiring Soon', expiryDate: '2026-07-20', owner: 'Executive Board', value: '18,000,000 MMK' },
       { id: 'pj-r4', name: 'Shopify / WooCommerce Sync Server Engine', category: 'Cloud IT', status: 'Active', expiryDate: '2026-11-01', owner: 'Tech Specialist', value: '850,000 MMK' },
+      {"id": "rt-refresh-1", "name": "Dispatch label printer service", "category": "Fulfillment Equipment", "status": "Expiring Soon", "expiryDate": "2026-06-29", "owner": "Warehouse Lead", "value": "350,000 MMK"},
+      {"id": "rt-refresh-2", "name": "Branch stock count reconciliation", "category": "Inventory Control", "status": "Completed", "expiryDate": "2026-06-22", "owner": "Inventory Lead", "value": "1,280,000 MMK"},
     ],
   },
 
   restaurant: {
     id: 'restaurant',
+    teamMembers: [
+    { name: 'Chef Zaw Naing', role: 'Executive Head Chef', department: 'Kitchen & Culinary', status: 'Active', shifts: 'Dinner Shift' },
+    { name: 'Daw Hlaing Hlaing', role: 'Restaurant Floor Manager', department: 'Front of House', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ko Tin Tun', role: 'Sous Chef & Prep Lead', department: 'Kitchen Operations', status: 'Active', shifts: 'Morning Shift' },
+    { name: 'Ma Phyu Sin', role: 'VIP Reservations & Hostess', department: 'Guest Relations', status: 'Active', shifts: 'Evening Shift' },
+    { name: 'Ko Ye Lin', role: 'Barista & Beverage Captain', department: 'Bar & Service', status: 'Active', shifts: 'Day Shift' },
+    {"name": "Ma Hnin Ei", "role": "Service Captain", "department": "Service", "status": "Active", "shifts": "Evening Shift"},
+    {"name": "Ko Zaw Lin", "role": "Kitchen Prep Cook", "department": "Kitchen", "status": "On Leave", "shifts": "Morning Shift"},
+  ],
+    demoProfile: {
+      "organizations": [
+            "Thazin Office Catering",
+            "Nilar Event Studio",
+            "Golden Tamarind Club",
+            "Aye Chan Workshop"
+      ],
+      "services": [
+            {
+                  "name": "Private dining reservation",
+                  "category": "Dining Revenue",
+                  "price": 22000,
+                  "quantity": 8,
+                  "followUp": "Confirm private dining reservation",
+                  "note": "Guest requested a quiet table and two vegetarian options."
+            },
+            {
+                  "name": "Office lunch catering",
+                  "category": "Catering Revenue",
+                  "price": 14500,
+                  "quantity": 25,
+                  "followUp": "Confirm catering headcount",
+                  "note": "Finalize delivery access and the vegetarian meal count."
+            },
+            {
+                  "name": "Birthday dinner package",
+                  "category": "Events Revenue",
+                  "price": 28500,
+                  "quantity": 12,
+                  "followUp": "Confirm birthday dinner details",
+                  "note": "Guest asked for a small cake table and early seating."
+            },
+            {
+                  "name": "Coffee workshop booking",
+                  "category": "Cafe Revenue",
+                  "price": 18000,
+                  "quantity": 6,
+                  "followUp": "Confirm coffee workshop booking",
+                  "note": "Reserve six places and share the workshop arrival time."
+            },
+            {
+                  "name": "Family takeaway set",
+                  "category": "Takeaway Revenue",
+                  "price": 48000,
+                  "quantity": 1,
+                  "followUp": "Confirm takeaway pickup",
+                  "note": "Kitchen should pack sauces separately for collection."
+            },
+            {
+                  "name": "Weekend brunch reservation",
+                  "category": "Dining Revenue",
+                  "price": 19500,
+                  "quantity": 4,
+                  "followUp": "Confirm weekend brunch table",
+                  "note": "Guest requested a high chair and a window-side table."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Ingredients",
+                  "title": "Fresh produce and kitchen ingredients",
+                  "supplier": "Morning Market Supply",
+                  "weight": 42
+            },
+            {
+                  "category": "Payroll & HR",
+                  "title": "Kitchen and service payroll",
+                  "supplier": "Staff payroll",
+                  "weight": 30
+            },
+            {
+                  "category": "Facility Operations",
+                  "title": "Restaurant lease and utilities",
+                  "supplier": "Facilities account",
+                  "weight": 18
+            },
+            {
+                  "category": "Packaging & Delivery",
+                  "title": "Takeaway packaging and delivery",
+                  "supplier": "Parcel partner",
+                  "weight": 6
+            },
+            {
+                  "category": "Equipment Maintenance",
+                  "title": "Refrigeration service visit",
+                  "supplier": "KitchenCare Services",
+                  "weight": 4
+            }
+      ],
+      "seasonalFactors": [
+            0.99,
+            1.08,
+            1.02,
+            1.2,
+            0.89,
+            0.93,
+            0.92,
+            0.97,
+            1.04,
+            1.11,
+            1.15,
+            1.28
+      ],
+      "queueStages": [
+            "Confirmed",
+            "Preparing table",
+            "Awaiting deposit",
+            "Dietary confirmation"
+      ],
+      "queueStations": [
+            "Main dining",
+            "Garden seating",
+            "Private room"
+      ]
+},
     name: 'Restaurant, Cafe & Hospitality',
     tagline: 'Table turnover, food cost %, bar takings, and reservation pacing.',
     badge: 'F&B & Hospitality',
@@ -915,10 +1554,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Finance', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     stats: {
       revenueToday: '4,150,000 MMK',
@@ -1110,11 +1751,134 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'pj-f2', name: 'Fire Safety & Hood Suppression Inspection', category: 'Compliance & Safety', status: 'Active', expiryDate: '2026-11-30', owner: 'General Manager', value: '680,000 MMK' },
       { id: 'pj-f3', name: 'POS Wireless Handheld Terminals (5 Units)', category: 'Dining Room Tech', status: 'Active', expiryDate: '2026-07-01', owner: 'F&B Captain', value: '1,400,000 MMK' },
       { id: 'pj-f4', name: 'Municipal Food Hygiene License Renewal', category: 'Govt Licensing', status: 'In Progress', expiryDate: '2026-08-15', owner: 'Admin Team', value: '300,000 MMK' },
+      {"id": "rs-refresh-1", "name": "Walk-in chiller service", "category": "Kitchen Equipment", "status": "Expiring Soon", "expiryDate": "2026-06-27", "owner": "Kitchen Manager", "value": "3,200,000 MMK"},
+      {"id": "rs-refresh-2", "name": "Dining area lighting upgrade", "category": "Facility Improvement", "status": "Completed", "expiryDate": "2026-06-16", "owner": "Floor Manager", "value": "680,000 MMK"},
     ],
   },
 
   realestate: {
     id: 'realestate',
+    teamMembers: [
+    { name: 'U Khin Maung', role: 'Principal Broker & Director', department: 'Executive Agency', status: 'Active', shifts: 'Full Day' },
+    { name: 'Daw Tin Tin Hla', role: 'Senior Commercial Property Agent', department: 'Commercial Deals', status: 'Active', shifts: 'Client Rotation' },
+    { name: 'Ko Myo Thant', role: 'Residential Sales Specialist', department: 'Residential Sales', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ma Ei Sandar', role: 'Legal Documentation & Deeds Officer', department: 'Conveyancing', status: 'Active', shifts: 'Morning Shift' },
+    { name: 'Ko Min Min', role: 'Site Inspection & Viewing Agent', department: 'Field Operations', status: 'Active', shifts: 'Flexible' },
+    {"name": "Ma Hnin Ei", "role": "Listing Coordinator", "department": "Field Operations", "status": "On Leave", "shifts": "Full Day"},
+  ],
+    demoProfile: {
+      "organizations": [
+            "Thazin Living Holdings",
+            "Nilar Property Partners",
+            "Golden Tamarind Offices",
+            "Aye Chan Investment"
+      ],
+      "services": [
+            {
+                  "name": "Two-bedroom apartment viewing",
+                  "category": "Residential Sales",
+                  "price": 750000,
+                  "quantity": 1,
+                  "followUp": "Confirm apartment viewing",
+                  "note": "Buyer requested floor plans and a car-parking confirmation."
+            },
+            {
+                  "name": "Commercial lease placement",
+                  "category": "Leasing Fees",
+                  "price": 1800000,
+                  "quantity": 1,
+                  "followUp": "Review commercial lease terms",
+                  "note": "Tenant asked for a fit-out period before rent commences."
+            },
+            {
+                  "name": "Townhouse purchase consultation",
+                  "category": "Sales Commissions",
+                  "price": 3200000,
+                  "quantity": 1,
+                  "followUp": "Confirm townhouse documents",
+                  "note": "Buyer is waiting for the title document checklist."
+            },
+            {
+                  "name": "Monthly property management",
+                  "category": "Management Fees",
+                  "price": 450000,
+                  "quantity": 1,
+                  "followUp": "Review property maintenance report",
+                  "note": "Owner requested photos and a repair cost breakdown."
+            },
+            {
+                  "name": "Office relocation search",
+                  "category": "Commercial Deals",
+                  "price": 1250000,
+                  "quantity": 1,
+                  "followUp": "Shortlist office viewing slots",
+                  "note": "Tenant needs space for twelve staff near public transport."
+            },
+            {
+                  "name": "Lease renewal advisory",
+                  "category": "Leasing Fees",
+                  "price": 650000,
+                  "quantity": 1,
+                  "followUp": "Confirm lease renewal terms",
+                  "note": "Both parties are reviewing the proposed renewal rent."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Agent Commissions",
+                  "title": "Broker and referral commission settlement",
+                  "supplier": "Agency partners",
+                  "weight": 48
+            },
+            {
+                  "category": "Marketing",
+                  "title": "Property photography and listing placement",
+                  "supplier": "Listing studio",
+                  "weight": 22
+            },
+            {
+                  "category": "Payroll & HR",
+                  "title": "Sales support and administration payroll",
+                  "supplier": "Staff payroll",
+                  "weight": 17
+            },
+            {
+                  "category": "Facility Operations",
+                  "title": "Sales gallery lease and utilities",
+                  "supplier": "Facilities account",
+                  "weight": 9
+            },
+            {
+                  "category": "Legal & Documentation",
+                  "title": "Title search and document processing",
+                  "supplier": "Conveyancing desk",
+                  "weight": 4
+            }
+      ],
+      "seasonalFactors": [
+            0.88,
+            0.95,
+            1.07,
+            0.74,
+            1.03,
+            0.92,
+            1.06,
+            1.12,
+            0.98,
+            1.08,
+            1.14,
+            1.03
+      ],
+      "queueStages": [
+            "Viewing confirmed",
+            "Documents in review",
+            "Awaiting confirmation",
+            "Title clarification"
+      ],
+      "queueStations": [
+            "Sales gallery"
+      ]
+},
     name: 'Real Estate & Property Dev',
     tagline: 'Property unit sales, site viewing pacing, broker commissions, and bookings.',
     badge: 'Property & Land',
@@ -1130,10 +1894,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Finance & Commissions', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     stats: {
       revenueToday: '18,500,000 MMK',
@@ -1308,11 +2074,135 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'pj-re1', name: 'Golden City Tower B Structural Handover', category: 'Construction & Delivery', status: 'In Progress', expiryDate: '2026-09-30', owner: 'Project Director', value: '450,000,000 MMK' },
       { id: 'pj-re2', name: 'Sales Gallery Lease Renewal (Pyay Road)', category: 'Commercial Lease', status: 'Expiring Soon', expiryDate: '2026-07-15', owner: 'Admin Team', value: '18,000,000 MMK' },
       { id: 'pj-re3', name: 'Municipal Building Safety Certificate', category: 'Legal Compliance', status: 'Active', expiryDate: '2026-08-31', owner: 'Legal Team', value: '2,500,000 MMK' },
+      {"id": "re-refresh-1", "name": "Thazin Living apartment photography", "category": "Listing Preparation", "status": "In Progress", "expiryDate": "2026-07-08", "owner": "Listing Coordinator", "value": "320,000 MMK"},
+      {"id": "re-refresh-2", "name": "Nilar office title document review", "category": "Legal Compliance", "status": "Completed", "expiryDate": "2026-06-18", "owner": "Legal Team", "value": "450,000 MMK"},
     ],
   },
 
   education: {
     id: 'education',
+    teamMembers: [
+    { name: 'Dr. Kyaw Kyaw Oo', role: 'Dean & Academic Director', department: 'Faculty Administration', status: 'Active', shifts: 'Full Day' },
+    { name: 'Daw Ni Ni Lwin', role: 'Lead Technical Instructor', department: 'Software Engineering', status: 'Active', shifts: 'Morning Lectures' },
+    { name: 'Ko Aung Kaung', role: 'Student Success & Admissions Officer', department: 'Student Affairs', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ma Htet Htet', role: 'LMS & Learning Platform Specialist', department: 'Academic Tech', status: 'Active', shifts: 'Flexible' },
+    { name: 'Ko Soe Win', role: 'Laboratory & Classroom Supervisor', department: 'Campus Facilities', status: 'Active', shifts: 'Day Shift' },
+    {"name": "Daw Hnin Thiri", "role": "Business English Instructor", "department": "Language Faculty", "status": "On Leave", "shifts": "Evening Classes"},
+    {"name": "Ko Nyi Lin", "role": "Teaching Assistant", "department": "Software Engineering", "status": "Active", "shifts": "Weekend Classes"},
+  ],
+    demoProfile: {
+      "organizations": [
+            "Thazin Learning Circle",
+            "Nilar Technology Group",
+            "Golden Tamarind Academy",
+            "Aye Chan Professional Network"
+      ],
+      "services": [
+            {
+                  "name": "Weekend web development cohort",
+                  "category": "Course Fees",
+                  "price": 420000,
+                  "quantity": 1,
+                  "followUp": "Confirm course enrollment",
+                  "note": "Applicant requested the weekend timetable before paying."
+            },
+            {
+                  "name": "Corporate spreadsheet workshop",
+                  "category": "Corporate Training",
+                  "price": 65000,
+                  "quantity": 16,
+                  "followUp": "Confirm workshop participant list",
+                  "note": "HR requested practical exercises using a sample sales sheet."
+            },
+            {
+                  "name": "Business English evening course",
+                  "category": "Language Courses",
+                  "price": 185000,
+                  "quantity": 1,
+                  "followUp": "Confirm placement interview",
+                  "note": "Applicant prefers weekday evening classes."
+            },
+            {
+                  "name": "UI design foundation course",
+                  "category": "Course Fees",
+                  "price": 320000,
+                  "quantity": 1,
+                  "followUp": "Review portfolio and laptop requirements",
+                  "note": "Share the software checklist before the first session."
+            },
+            {
+                  "name": "Exam preparation group",
+                  "category": "Exam Preparation",
+                  "price": 240000,
+                  "quantity": 1,
+                  "followUp": "Confirm exam preparation schedule",
+                  "note": "Student asked for mock-test dates and an installment option."
+            },
+            {
+                  "name": "Leadership skills workshop",
+                  "category": "Corporate Training",
+                  "price": 85000,
+                  "quantity": 10,
+                  "followUp": "Approve leadership workshop agenda",
+                  "note": "Learning manager requested a team communication module."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Faculty Fees",
+                  "title": "Instructor and teaching assistant fees",
+                  "supplier": "Faculty payroll",
+                  "weight": 42
+            },
+            {
+                  "category": "Facility Operations",
+                  "title": "Classroom lease and utilities",
+                  "supplier": "Facilities account",
+                  "weight": 23
+            },
+            {
+                  "category": "Payroll & HR",
+                  "title": "Admissions and operations payroll",
+                  "supplier": "Staff payroll",
+                  "weight": 18
+            },
+            {
+                  "category": "Learning Materials",
+                  "title": "Printed workbooks and learner supplies",
+                  "supplier": "Academic supplies",
+                  "weight": 8
+            },
+            {
+                  "category": "Software & LMS",
+                  "title": "Learning platform and classroom software",
+                  "supplier": "Learning systems",
+                  "weight": 9
+            }
+      ],
+      "seasonalFactors": [
+            0.96,
+            0.88,
+            1.08,
+            0.72,
+            1.19,
+            1.12,
+            1.1,
+            1.02,
+            1.21,
+            0.98,
+            1.02,
+            0.86
+      ],
+      "queueStages": [
+            "Seat confirmed",
+            "Interview booked",
+            "Awaiting documents",
+            "Payment plan review"
+      ],
+      "queueStations": [
+            "Admissions desk"
+      ]
+},
     name: 'Education & Training Academy',
     tagline: 'Student admissions, course batch cohorts, tuition fees, and trainer allocations.',
     badge: 'Education & EdTech',
@@ -1328,10 +2218,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Finance', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     stats: {
       revenueToday: '4,650,000 MMK',
@@ -1506,11 +2398,139 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'pj-ed1', name: 'Learning Management System (LMS) Cloud Cluster', category: 'EdTech Platform', status: 'Active', expiryDate: '2026-12-31', owner: 'Tech Lead', value: '3,800,000 MMK' },
       { id: 'pj-ed2', name: 'Downtown Training Campus Lease Agreement', category: 'Campus Property', status: 'Expiring Soon', expiryDate: '2026-07-31', owner: 'Operations Director', value: '14,500,000 MMK' },
       { id: 'pj-ed3', name: 'AWS Student Lab Vouchers & Credits', category: 'Lab Licenses', status: 'Active', expiryDate: '2026-11-15', owner: 'Course Manager', value: '1,200,000 MMK' },
+      {"id": "ed-refresh-1", "name": "Training room projector service", "category": "Classroom Equipment", "status": "Expiring Soon", "expiryDate": "2026-06-29", "owner": "Campus Facilities Lead", "value": "850,000 MMK"},
+      {"id": "ed-refresh-2", "name": "Weekend web cohort curriculum update", "category": "Course Delivery", "status": "Completed", "expiryDate": "2026-06-20", "owner": "Lead Instructor", "value": "420,000 MMK"},
     ],
   },
 
   logistics: {
     id: 'logistics',
+    teamMembers: [
+    { name: 'U Aung Min', role: 'Project Director', department: 'Project Management', status: 'Active', shifts: 'Site Rotation' },
+    { name: 'Daw Thiri Hlaing', role: 'Lead Quantity Surveyor (QS)', department: 'BOQ & Cost Control', status: 'Active', shifts: 'Full Day' },
+    { name: 'Ko Htet Naing', role: 'Senior Site Engineer', department: 'North Dagon Site', status: 'Active', shifts: 'Morning Site Shift' },
+    { name: 'U Zaw Lin', role: 'Plant & MEP Subcon Lead', department: 'Heavy Plant & MEP', status: 'Active', shifts: 'Project Based' },
+    { name: 'Ma May Zin', role: 'Health & Safety Officer (HSE)', department: 'HSE & Compliance', status: 'Active', shifts: 'Day Shift' },
+    { name: 'Ko Wai Yan', role: 'Structural QA/QC Inspector', department: 'Quality Assurance', status: 'Active', shifts: 'Morning Site Shift' },
+    { name: 'Daw Khin Aye', role: 'Procurement Specialist', department: 'Materials Procurement', status: 'Active', shifts: 'Full Day' },
+    { name: 'U Myo Min', role: 'Excavator & Rigging Foreman', department: 'Site Operations', status: 'On Leave', shifts: 'Covered' },
+    {"name": "Ko Zaw Lin", "role": "Site Storekeeper", "department": "Materials Procurement", "status": "Active", "shifts": "Site Rotation"},
+  ],
+    demoProfile: {
+      "organizations": [
+            "Thazin Development Group",
+            "Nilar Civil Works",
+            "Golden Tamarind Industrial",
+            "Aye Chan Construction"
+      ],
+      "services": [
+            {
+                  "name": "Ground-floor concrete works",
+                  "category": "Structural Works",
+                  "price": 18500000,
+                  "quantity": 1,
+                  "followUp": "Confirm concrete pour schedule",
+                  "note": "Confirm pump access and the inspection sign-off before pouring."
+            },
+            {
+                  "name": "Warehouse roofing package",
+                  "category": "Roofing Works",
+                  "price": 12400000,
+                  "quantity": 1,
+                  "followUp": "Review roofing material submission",
+                  "note": "Client requested confirmation of sheet thickness and coating."
+            },
+            {
+                  "name": "Office electrical fit-out",
+                  "category": "MEP Works",
+                  "price": 6800000,
+                  "quantity": 1,
+                  "followUp": "Approve electrical layout revision",
+                  "note": "Revised socket locations need consultant approval."
+            },
+            {
+                  "name": "Residential foundation package",
+                  "category": "Foundation Works",
+                  "price": 22400000,
+                  "quantity": 1,
+                  "followUp": "Review foundation quotation",
+                  "note": "Confirm soil report assumptions before final pricing."
+            },
+            {
+                  "name": "Site plant hire package",
+                  "category": "Plant Hire",
+                  "price": 950000,
+                  "quantity": 3,
+                  "followUp": "Confirm plant mobilization",
+                  "note": "Site access must be cleared before equipment delivery."
+            },
+            {
+                  "name": "Waterproofing repair package",
+                  "category": "Maintenance Works",
+                  "price": 2750000,
+                  "quantity": 1,
+                  "followUp": "Schedule waterproofing inspection",
+                  "note": "Arrange a joint inspection before issuing the work order."
+            }
+      ],
+      "expenses": [
+            {
+                  "category": "Materials",
+                  "title": "Rebar and ready-mix procurement",
+                  "supplier": "Thazin Building Supply",
+                  "weight": 46
+            },
+            {
+                  "category": "Site Labour",
+                  "title": "Site crew and subcontractor settlement",
+                  "supplier": "Site payroll",
+                  "weight": 26
+            },
+            {
+                  "category": "Plant & Equipment",
+                  "title": "Plant hire and equipment service",
+                  "supplier": "Nilar Plant Hire",
+                  "weight": 15
+            },
+            {
+                  "category": "Transport & Fuel",
+                  "title": "Site transport and diesel",
+                  "supplier": "Fleet account",
+                  "weight": 9
+            },
+            {
+                  "category": "Safety & Compliance",
+                  "title": "Protective equipment and site inspection",
+                  "supplier": "Site safety desk",
+                  "weight": 4
+            }
+      ],
+      "seasonalFactors": [
+            0.98,
+            1.08,
+            1.13,
+            1.02,
+            0.96,
+            0.83,
+            0.76,
+            0.8,
+            0.92,
+            1.06,
+            1.14,
+            1.18
+      ],
+      "queueStages": [
+            "Approved",
+            "In progress",
+            "Consultant review",
+            "Material hold"
+      ],
+      "queueStations": [
+            "Project Director",
+            "Lead QS",
+            "Site Engineer"
+      ]
+},
     name: 'Construction & Contracting',
     tagline: 'Project progress, budgets, site risks, materials, and contractor operations.',
     badge: 'Construction Operations',
@@ -1526,10 +2546,12 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       ] },
       { label: 'Intelligence', items: [
         { title: 'Finance', href: '/finance', icon: 'Wallet' },
-        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
         { title: 'AI 90-Day Roadmap', href: '/planning', icon: 'Lightbulb' },
       ] },
-      { label: 'Workspace', items: [{ title: 'Settings', href: '/settings', icon: 'Settings' }] },
+      { label: 'Workspace', items: [
+        { title: 'Data Approvals', href: '/data-approvals', icon: 'ClipboardCheck' },
+        { title: 'Settings', href: '/settings', icon: 'Settings' },
+      ] },
     ],
     stats: {
       revenueToday: '12,600,000 MMK',
@@ -1709,6 +2731,8 @@ export const INDUSTRIES: Record<IndustryId, IndustryConfig> = {
       { id: 'pj-log6', name: 'Bago Retail Commercial Center — Foundation Works', category: 'Active Project', status: 'Expiring Soon', expiryDate: '2026-07-15', owner: 'Senior Civil Engineer', value: '74,000,000 MMK' },
       { id: 'pj-log7', name: 'Structural Rebar Grade 60 (Batch 14 Reserve)', category: 'Bulk Material Stock', status: 'Active', expiryDate: '2026-08-30', owner: 'Procurement Specialist', value: '46,500,000 MMK' },
       { id: 'pj-log8', name: 'Scaffolding & Formwork System (BS 1139 Standard)', category: 'Site Equipment', status: 'Active', expiryDate: '2026-12-15', owner: 'Safety Officer', value: '38,000,000 MMK' },
+      {"id": "co-refresh-1", "name": "Nilar warehouse roofing material approval", "category": "Material Submittal", "status": "In Progress", "expiryDate": "2026-07-03", "owner": "Lead QS", "value": "12,400,000 MMK"},
+      {"id": "co-refresh-2", "name": "Site safety induction register review", "category": "Safety Compliance", "status": "Completed", "expiryDate": "2026-06-21", "owner": "Safety Officer", "value": "180,000 MMK"},
     ],
   },
 };

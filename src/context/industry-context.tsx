@@ -2,7 +2,9 @@
 
 import React, { createContext, useContext, useState, useLayoutEffect } from 'react';
 import { INDUSTRIES, IndustryId, IndustryConfig } from '@/data/industries';
-import { getEnrichedIndustries } from '@/lib/extended-data-injector';
+import { serializeDemoState, restoreDemoState } from '@/lib/demo-data-cache';
+import { refreshSeedRecords } from '@/lib/demo-data-migration';
+import { getEnrichedIndustries, getLegacyEnrichedIndustries } from '@/lib/extended-data-injector';
 import { toast } from 'sonner';
 import { reportingRange, validDate } from '@/lib/metrics';
 import { demoSlugToIndustry } from '@/lib/sector-page-copy';
@@ -80,37 +82,51 @@ export function IndustryProvider({ children }: { children: React.ReactNode }) {
       if (!routeIndustry && saved && Object.hasOwn(INDUSTRIES, saved)) {
         setCurrentIndustryId(saved);
       }
-      const savedCustomData = localStorage.getItem('mot_custom_industry_data_v4');
+      const savedCurrentData = localStorage.getItem('mot_custom_industry_data_v5');
+      const savedCustomData = savedCurrentData ?? localStorage.getItem('mot_custom_industry_data_v4');
       if (savedCustomData) {
         try {
-          const parsed = JSON.parse(savedCustomData) as Partial<Record<IndustryId, IndustryConfig>>;
+          const payload = JSON.parse(savedCustomData);
           // Preserve valid saved records, including intentionally empty arrays.
           // Source-owned configuration always wins over stale cached labels/targets.
           const fresh = getEnrichedIndustries();
+          const parsed = restoreDemoState(payload, fresh);
+          const previous = savedCurrentData ? null : getLegacyEnrichedIndustries();
           for (const id of Object.keys(fresh) as IndustryId[]) {
             const cached = parsed?.[id];
             if (!cached) continue;
             if (Array.isArray(cached.demandRecords) && cached.demandRecords.every(r =>
               r && typeof r.id === 'string' && typeof r.customerName === 'string' &&
               typeof r.company === 'string' && typeof r.serviceName === 'string' &&
+              typeof r.phone === 'string' && typeof r.note === 'string' &&
+              typeof r.sourceChannel === 'string' && validDate(r.followUpDate) &&
               Number.isFinite(r.serviceAmount) && r.serviceAmount >= 0 &&
               Number.isFinite(r.serviceQty) && r.serviceQty > 0 &&
               ['new', 'contacted', 'quoted', 'pending', 'closed'].includes(r.status) &&
               (r.createdDate === undefined || validDate(r.createdDate)))) {
-              fresh[id].demandRecords = cached.demandRecords;
+              fresh[id].demandRecords = previous ? refreshSeedRecords(fresh[id].demandRecords, previous[id].demandRecords, cached.demandRecords) : cached.demandRecords;
             }
             if (Array.isArray(cached.financeTransactions) && cached.financeTransactions.every(t =>
               t && typeof t.id === 'string' && validDate(t.date) &&
+              typeof t.title === 'string' && typeof t.paymentMethod === 'string' && typeof t.reference === 'string' &&
               typeof t.category === 'string' && ['income', 'expense'].includes(t.type) &&
               Number.isFinite(t.amount) && t.amount >= 0)) {
-              fresh[id].financeTransactions = cached.financeTransactions;
+              fresh[id].financeTransactions = previous ? refreshSeedRecords(fresh[id].financeTransactions, previous[id].financeTransactions, cached.financeTransactions) : cached.financeTransactions;
             }
             if (Array.isArray(cached.customerFollowUps) && cached.customerFollowUps.every(f =>
-              f && typeof f.id === 'string' && validDate(f.dueDate))) {
-              fresh[id].customerFollowUps = cached.customerFollowUps;
+              f && typeof f.id === 'string' && validDate(f.dueDate) &&
+              typeof f.name === 'string' && typeof f.phone === 'string' &&
+              typeof f.topic === 'string' && typeof f.channel === 'string' && typeof f.notes === 'string')) {
+              fresh[id].customerFollowUps = previous ? refreshSeedRecords(fresh[id].customerFollowUps, previous[id].customerFollowUps, cached.customerFollowUps) : cached.customerFollowUps;
             }
           }
           setIndustryState(fresh);
+          try {
+            localStorage.setItem('mot_custom_industry_data_v5', serializeDemoState(fresh));
+            if (!savedCurrentData) localStorage.removeItem('mot_custom_industry_data_v4');
+          } catch {
+            // Keep the old cache intact if the migrated payload cannot be saved.
+          }
         } catch (err) {
           console.error('Failed to load cached custom data', err);
         }
@@ -121,7 +137,7 @@ export function IndustryProvider({ children }: { children: React.ReactNode }) {
         const fresh = getEnrichedIndustries();
         setIndustryState(fresh);
         try {
-          localStorage.setItem('mot_custom_industry_data_v4', JSON.stringify(fresh));
+          localStorage.setItem('mot_custom_industry_data_v5', serializeDemoState(fresh));
         } catch {
           // ignore storage error
         }
@@ -136,7 +152,7 @@ export function IndustryProvider({ children }: { children: React.ReactNode }) {
   const saveCustomState = (updated: Record<IndustryId, IndustryConfig>) => {
     setIndustryState(updated);
     try {
-      localStorage.setItem('mot_custom_industry_data_v4', JSON.stringify(updated));
+      localStorage.setItem('mot_custom_industry_data_v5', serializeDemoState(updated));
     } catch {
       // ignore storage error
     }
@@ -263,7 +279,7 @@ export function IndustryProvider({ children }: { children: React.ReactNode }) {
     setCustomFrom('2026-06-01');
     setCustomTo('2026-06-30');
     try {
-      localStorage.setItem('mot_custom_industry_data_v4', JSON.stringify(fresh));
+      localStorage.setItem('mot_custom_industry_data_v5', serializeDemoState(fresh));
     } catch {
       // The in-memory reset still gives the current demo a clean state.
     }

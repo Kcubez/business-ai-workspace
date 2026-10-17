@@ -6,6 +6,7 @@ export interface SectorPageCopy {
   customerTitle: string;
   customerSubtitle: string;
   assetTitle: string;
+  assetRegisterTitle: string;
   assetSubtitle: string;
   teamTitle: string;
   teamSubtitle: string;
@@ -32,6 +33,7 @@ export interface SectorPageCopy {
 
 const copy: Record<IndustryId, SectorPageCopy> = {
   factory: {
+    assetRegisterTitle: 'Materials & Equipment Register',
     financeTitle: 'Factory Finance & Production Costs',
     salesTitle: 'Production Orders & Buyer Pipeline',
     customerTitle: 'Buyers & Dispatch Follow-ups',
@@ -59,6 +61,7 @@ const copy: Record<IndustryId, SectorPageCopy> = {
     addAmountPlaceholder: '2500000',
   },
   clinic: {
+    assetRegisterTitle: 'Equipment & Compliance Register',
     financeTitle: 'Clinic Finance & Collections',
     salesTitle: 'Appointments & Patient Demand',
     customerTitle: 'Patients & Follow-up Desk',
@@ -86,6 +89,7 @@ const copy: Record<IndustryId, SectorPageCopy> = {
     addAmountPlaceholder: '250000',
   },
   agency: {
+    assetRegisterTitle: 'Projects & Infrastructure Register',
     financeTitle: 'Service Finance & Retainers',
     salesTitle: 'Sales Pipeline & Proposals',
     customerTitle: 'Client Success & Follow-ups',
@@ -113,6 +117,7 @@ const copy: Record<IndustryId, SectorPageCopy> = {
     addAmountPlaceholder: '3500000',
   },
   retail: {
+    assetRegisterTitle: 'Inventory & Store Asset Register',
     financeTitle: 'Retail Finance & Cash Flow',
     salesTitle: 'Sales & POS Activity',
     customerTitle: 'Customers & Service Desk',
@@ -140,6 +145,7 @@ const copy: Record<IndustryId, SectorPageCopy> = {
     addAmountPlaceholder: '185000',
   },
   restaurant: {
+    assetRegisterTitle: 'Kitchen & Facility Register',
     financeTitle: 'Restaurant Finance & Food Cost',
     salesTitle: 'Orders & Menu Performance',
     customerTitle: 'Guests & Reservations Desk',
@@ -167,6 +173,7 @@ const copy: Record<IndustryId, SectorPageCopy> = {
     addAmountPlaceholder: '450000',
   },
   realestate: {
+    assetRegisterTitle: 'Property & Document Register',
     financeTitle: 'Property Finance & Commissions',
     salesTitle: 'Buyer & Tenant Leads',
     customerTitle: 'Viewings & Follow-up Desk',
@@ -194,6 +201,7 @@ const copy: Record<IndustryId, SectorPageCopy> = {
     addAmountPlaceholder: '450000000',
   },
   education: {
+    assetRegisterTitle: 'Facilities & Learning Asset Register',
     financeTitle: 'Tuition Finance & Collections',
     salesTitle: 'Admissions & Enrollment',
     customerTitle: 'Students & Parent Follow-ups',
@@ -221,6 +229,7 @@ const copy: Record<IndustryId, SectorPageCopy> = {
     addAmountPlaceholder: '950000',
   },
   logistics: {
+    assetRegisterTitle: 'Fleet & Operations Register',
     financeTitle: 'Construction Finance & Receivables',
     salesTitle: 'Projects & Contract Pipeline',
     customerTitle: 'Client & Site Follow-ups',

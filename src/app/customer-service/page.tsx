@@ -1,12 +1,12 @@
 'use client';
 
+import { AttentionPanel, ClearAttention, RecordFilters, RecordSelect } from '@/components/ui/record-filters';
 import { PageHeadingCopy } from '@/components/ui/page-heading-copy';
 import { MetricIcon } from '@/components/ui/metric-icon';
 import { useIndustry } from '@/context/industry-context';
 import { useReportingMetrics } from '@/lib/use-reporting-metrics';
 import { followUpsForPeriod } from '@/lib/insights';
-import { useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import { TablePagination } from '@/components/ui/table-pagination';
 import { getSectorPageCopy } from '@/lib/sector-page-copy';
@@ -24,12 +24,27 @@ function CustomerServiceContent() {
   const { currentIndustry, markFollowUpDone } = useIndustry();
   const { range } = useReportingMetrics();
   const params = useSearchParams();
-  const overdueOnly = params.get('filter') === 'overdue';
+  const router = useRouter();
+  const status = params.get('filter') || 'all';
   const allFollowUps = followUpsForPeriod(currentIndustry, range);
-  const customerFollowUps = allFollowUps.filter(f => !overdueOnly || f.dueStatus === 'overdue');
+  const [search, setSearch] = useState('');
+  const [aging, setAging] = useState('all');
+  const [sort, setSort] = useState('oldest');
+  const age = (date: string) => Math.max(0, Math.round((Date.parse(range.to) - Date.parse(date)) / 86400000));
+  const customerFollowUps = allFollowUps.filter(item =>
+    (status === 'all' || (status === 'overdue' ? item.dueStatus === 'overdue' : status === 'due_today' ? item.dueStatus === 'due_today' : true)) &&
+    (aging === 'all' || (item.dueStatus === 'overdue' && (aging === '1-7' ? age(item.dueDate) <= 7 : aging === '8-14' ? age(item.dueDate) >= 8 && age(item.dueDate) <= 14 : age(item.dueDate) >= 15))) &&
+    `${item.name} ${item.phone} ${item.topic} ${item.channel}`.toLowerCase().includes(search.toLowerCase())
+  ).sort((a, b) => sort === 'oldest' ? a.dueDate.localeCompare(b.dueDate) : b.dueDate.localeCompare(a.dueDate));
   const pageCopy = getSectorPageCopy(currentIndustry.id);
 
   const [currentPage, setCurrentPage] = useState(1);
+  const selectStatus = (value: string) => {
+    const query = new URLSearchParams(params.toString());
+    if (value === 'all') query.delete('filter'); else query.set('filter', value);
+    router.replace(`/customer-service${query.size ? `?${query}` : ''}#follow-up-records`, { scroll: false });
+    setCurrentPage(1); setAging('all'); setSearch('');
+  };
   const pageSize = 10;
   const totalPages = Math.ceil(customerFollowUps.length / pageSize) || 1;
   const validPage = Math.min(currentPage, totalPages);
@@ -62,10 +77,10 @@ function CustomerServiceContent() {
         </PageHeadingCopy>
       </div>
 
-      <p className="text-xs text-slate-500">Due dates: {range.label} · Assessed as of {range.to}. Counts use currently outstanding records, not historical completion status.</p>
+      <p className="flex flex-wrap items-center gap-2 text-xs text-slate-500">Assessed as of {range.valid ? range.to : '—'}<button type="button" aria-label="About follow-up counts" title={`Includes currently outstanding follow-ups with due dates in ${range.label}. Assessed against the period end, not historical completion status.`} className="flex size-5 items-center justify-center rounded-full border border-slate-300 text-[11px] font-semibold dark:border-slate-700">i</button></p>
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#0ea5e9' }}>
+        <button type="button" onClick={() => selectStatus('due_today')} aria-pressed={status === 'due_today'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#0ea5e9', boxShadow: status === 'due_today' ? '0 0 0 1px #0ea5e9' : undefined }}>
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
             <span className="text-sm font-semibold ">Due at period end</span>
             <MetricIcon icon={Clock} color="#0ea5e9" />
@@ -76,9 +91,9 @@ function CustomerServiceContent() {
           <p className="text-xs text-sky-600 dark:text-sky-400 font-medium leading-relaxed">
             Due on the reporting end date
           </p>
-        </div>
+        </button>
 
-        <div className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#f43f5e' }}>
+        <button type="button" onClick={() => selectStatus('overdue')} aria-pressed={status === 'overdue'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#f43f5e', boxShadow: status === 'overdue' ? '0 0 0 1px #f43f5e' : undefined }}>
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
             <span className="text-sm font-semibold ">Overdue</span>
             <MetricIcon icon={AlertTriangle} color="#f43f5e" />
@@ -87,9 +102,9 @@ function CustomerServiceContent() {
             {overdue.length}
           </div>
           <p className="text-xs text-rose-500 font-medium leading-relaxed">Missed callback schedule</p>
-        </div>
+        </button>
 
-        <div className="grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#64748b' }}>
+        <button type="button" onClick={() => selectStatus('all')} aria-pressed={status === 'all'} className="text-left cursor-pointer focus-visible:ring-2 focus-visible:ring-sky-500 grid min-h-44 grid-rows-[auto_1fr_auto] gap-3 p-5 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 border border-l-4 border-slate-200 dark:border-slate-800 shadow-xs" style={{ borderLeftColor: '#64748b', boxShadow: status === 'all' ? '0 0 0 1px #64748b' : undefined }}>
           <div className="flex items-center justify-between gap-3 text-slate-500 dark:text-slate-400">
             <span className="text-sm font-semibold ">Outstanding in period</span>
             <MetricIcon icon={Calendar} color="#64748b" />
@@ -98,8 +113,16 @@ function CustomerServiceContent() {
             {allFollowUps.length}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Current outstanding records</p>
-        </div>
+        </button>
       </div>
+
+      <AttentionPanel title="Follow-up insights" chartTitle="Overdue aging" reviewTitle="Oldest outstanding follow-ups" subtitle="Outstanding records due within the selected period, assessed at its end." data={[
+        { id: '1-7', label: '1–7 days overdue', min: 1, max: 7, color: '#f59e0b' },
+        { id: '8-14', label: '8–14 days overdue', min: 8, max: 14, color: '#f97316' },
+        { id: '15+', label: '15+ days overdue', min: 15, max: Infinity, color: '#f43f5e' },
+      ].map(bucket => ({ label: bucket.label, value: overdue.filter(item => age(item.dueDate) >= bucket.min && age(item.dueDate) <= bucket.max).length, color: bucket.color, selected: aging === bucket.id, onSelect: () => { selectStatus('overdue'); setAging(bucket.id); } }))}>
+        {overdue.length ? <ul className="space-y-3">{[...overdue].sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 3).map(item => <li key={item.id} className="rounded-xl border border-slate-200 bg-white p-3 dark:border-slate-800 dark:bg-slate-900"><div className="flex flex-wrap items-baseline justify-between gap-2"><p className="text-xs font-semibold text-slate-900 dark:text-white">{item.name}</p><span className="text-[11px] font-semibold text-rose-600 dark:text-rose-400">{age(item.dueDate)} days overdue</span></div><p className="mt-1 text-xs leading-relaxed text-slate-500">{item.topic}</p><p className="mt-2 text-[11px] text-slate-400">{item.dueDate} · {item.channel}</p></li>)}</ul> : <ClearAttention>No overdue follow-ups in this period.</ClearAttention>}
+      </AttentionPanel>
 
       {/* Task Queue Table */}
       <div id="follow-up-records" className="scroll-mt-20 p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xs">
@@ -110,7 +133,11 @@ function CustomerServiceContent() {
           Contact schedule across Phone, Telegram, Viber, and Messenger
         </p>
 
-        {overdueOnly && <div className="mb-4 flex items-center gap-3 text-sm"><span>Overdue only · {customerFollowUps.length} records</span><Link href="/customer-service#follow-up-records" className="text-sky-600 underline">Clear filter</Link></div>}
+        <RecordFilters search={search} onSearch={value => { setSearch(value); setCurrentPage(1); }} placeholder="Search contacts, topics or channels…" count={customerFollowUps.length} onReset={() => { selectStatus('all'); setSort('oldest'); }}>
+          <RecordSelect aria-label="Filter follow-up status" value={status} onValueChange={selectStatus}><option value="all">All outstanding</option><option value="overdue">Overdue</option><option value="due_today">Due at period end</option></RecordSelect>
+          <RecordSelect aria-label="Filter overdue age" value={aging} onValueChange={value => { setAging(value); setCurrentPage(1); }}><option value="all">All ages</option><option value="1-7">1–7 days overdue</option><option value="8-14">8–14 days overdue</option><option value="15+">15+ days overdue</option></RecordSelect>
+          <RecordSelect aria-label="Sort follow-up dates" value={sort} onValueChange={value => { setSort(value); setCurrentPage(1); }}><option value="oldest">Oldest first</option><option value="newest">Newest first</option></RecordSelect>
+        </RecordFilters>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead>
@@ -124,7 +151,7 @@ function CustomerServiceContent() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-              {paginatedFollowUps.length === 0 && <tr><td colSpan={6} className="py-10 text-center text-slate-500">No follow-ups due in this period.</td></tr>}
+              {paginatedFollowUps.length === 0 && <tr><td colSpan={6} className="py-10 text-center text-slate-500">No follow-ups match this period and these filters.</td></tr>}
               {paginatedFollowUps.map((item) => {
                 const statusClass =
                   item.dueStatus === 'overdue'
@@ -163,7 +190,8 @@ function CustomerServiceContent() {
                     <td className="py-3 text-right">
                       <button
                         onClick={() => markFollowUpDone(item.id)}
-                        className="px-3 py-1 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-[11px] hover:opacity-90 cursor-pointer active:scale-95 transition-transform"
+                        style={{ backgroundColor: currentIndustry.color }}
+                        className="px-3 py-1 rounded-lg text-white font-semibold text-[11px] hover:opacity-90 cursor-pointer active:scale-95 transition-transform"
                       >
                         Mark Done
                       </button>
